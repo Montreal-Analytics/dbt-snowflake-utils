@@ -3,13 +3,13 @@
 This [dbt](https://github.com/fishtown-analytics/dbt) package contains Snowflake-specific macros that can be (re)used across dbt projects.
 
 ## Installation Instructions
-Check [dbt Hub](https://hub.getdbt.com/fishtown-analytics/snowflake-utils/latest/) for the latest installation instructions, or [read the docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
+Check [dbt Hub](https://hub.getdbt.com/fishtown-analytics/snowflake_utils/latest/) for the latest installation instructions, or [read the docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 
 ----
 
 ## Macros
 
-### warehouse_size() ([source](macros/warehouse_size.sql))
+### snowflake_utils.warehouse_size() ([source](macros/warehouse_size.sql))
 This macro returns an alternative warehouse if conditions are met. It will, in order, check the following conditions for incremental models:
 
 - The relation doesn't exist (initial run) _and_ a warehouse has been configured
@@ -24,7 +24,7 @@ Call the macro from the `snowflake_warehouse` model configuration:
 ```
 {{ 
     config(
-      snowflake_warehouse=warehouse_size()
+      snowflake_warehouse=snowflake_utils.warehouse_size()
     )
 }}
 ```
