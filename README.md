@@ -49,7 +49,8 @@ An example `dbt_project.yml` configuration:
 models:
     my_project:
         vars:
-            'snowflake-utils:full_run_warehouse': "transforming_xl_wh"
+            'snowflake-utils:initial_run_warehouse': "transforming_xl_wh"
+            'snowflake-utils:full_refresh_run_warehouse': "transforming_xl_wh"
 
 
 ```
