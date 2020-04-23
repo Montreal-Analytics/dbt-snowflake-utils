@@ -5,6 +5,9 @@ This [dbt](https://github.com/fishtown-analytics/dbt) package contains Snowflake
 ## Installation Instructions
 Check [dbt Hub](https://hub.getdbt.com/fishtown-analytics/snowflake_utils/latest/) for the latest installation instructions, or [read the docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 
+## Prerequisites
+Snowflake Utils is compatible with dbt 0.15.0 and later.
+
 ----
 
 ## Macros
@@ -55,5 +58,14 @@ models:
 
 ```
 
+#### Console Output
 
+When a variable is configured for a conditon _and_ that condition is matched when executing a run, a log message will confirm which condition was matched and which warehouse is being used.
+
+```
+12:00:00 | Concurrency: 16 threads (target='dev')
+12:00:00 | 
+12:00:00 | 1 of 1 START incremental model DBT_MGUINDON.fct_orders... [RUN]
+12:00:00 + Initial Run - Using warehouse TRANSFORMING_XL_WH
+```
 
