@@ -1,4 +1,4 @@
-name: 'dbt_snowflake_utils'
+name: 'snowflake_utils'
 version: '0.1.0'
 
 require-dbt-version: ">=0.15.1"

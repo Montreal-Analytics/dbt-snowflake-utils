@@ -35,9 +35,9 @@ Out-of-the-box, the macro will return the `target.warehouse` for each condition,
 
 | variable | information | required |
 |----------|-------------|:--------:|
-|snowflake-utils:initial_run_warehouse|Alternative warehouse when the relation doesn't exist|No|
-|snowflake-utils:full_refresh_run_warehouse|Alternative warehouse when doing a `--full-refresh`|No|
-|snowflake-utils:incremental_run_warehouse|Alternative warehouse to use for incremental runs|No|
+|snowflake_utils:initial_run_warehouse|Alternative warehouse when the relation doesn't exist|No|
+|snowflake_utils:full_refresh_run_warehouse|Alternative warehouse when doing a `--full-refresh`|No|
+|snowflake_utils:incremental_run_warehouse|Alternative warehouse to use for incremental runs|No|
 
 An example `dbt_project.yml` configuration:
 
@@ -49,8 +49,8 @@ An example `dbt_project.yml` configuration:
 models:
     my_project:
         vars:
-            'snowflake-utils:initial_run_warehouse': "transforming_xl_wh"
-            'snowflake-utils:full_refresh_run_warehouse': "transforming_xl_wh"
+            'snowflake_utils:initial_run_warehouse': "transforming_xl_wh"
+            'snowflake_utils:full_refresh_run_warehouse': "transforming_xl_wh"
 
 
 ```
