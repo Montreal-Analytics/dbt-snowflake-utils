@@ -69,3 +69,7 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 12:00:00 + Initial Run - Using warehouse TRANSFORMING_XL_WH
 ```
 
+----
+
+## Contributions
+Contributions to this package are very welcome! Please create issues for bugs or feature requests, or open PRs against `master`.
