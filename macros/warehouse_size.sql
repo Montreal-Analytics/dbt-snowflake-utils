@@ -18,11 +18,6 @@
             {{ dbt_utils.log_info("Full Refresh Run - Using alternative warehouse " ~ full_wh | upper) }}
             {% do return(full_wh) %}
 
-        {#-- use alternative warehouse if incremental run #}
-        {% elif relation is not none and inc_wh is not none %}
-            {{ dbt_utils.log_info("Incremental Run - Using alternative warehouse " ~ inc_wh | upper) }}
-            {% do return(inc_wh) %}        
-
         {#-- use target warehouse if variable not configured for a condition #}
         {% else %}
             {{ dbt_utils.log_info("Using target warehouse " ~ target.warehouse | upper) }}
