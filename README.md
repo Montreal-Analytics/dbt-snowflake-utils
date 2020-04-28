@@ -17,7 +17,6 @@ This macro returns an alternative warehouse if conditions are met. It will, in o
 
 - The relation doesn't exist (initial run) _and_ a warehouse has been configured
 - Full refresh run _and_ a warehouse has been configured
-- Incremental run _and_ a warehouse has been configured
 
 Otherwise, it returns the target warehouse configured in the profile.
 
@@ -40,7 +39,6 @@ Out-of-the-box, the macro will return the `target.warehouse` for each condition,
 |----------|-------------|:--------:|
 |snowflake_utils:initial_run_warehouse|Alternative warehouse when the relation doesn't exist|No|
 |snowflake_utils:full_refresh_run_warehouse|Alternative warehouse when doing a `--full-refresh`|No|
-|snowflake_utils:incremental_run_warehouse|Alternative warehouse to use for incremental runs|No|
 
 An example `dbt_project.yml` configuration:
 
