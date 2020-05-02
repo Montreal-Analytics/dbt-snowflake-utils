@@ -1,0 +1,10 @@
+version: 2
+
+macros:
+  - name: clone_schema
+    description: '{{ doc("clone_schema") }}'
+    arguments:
+      - name: source_schema
+        description: Source schema name
+      - name: destination_schema
+        description: Destination schema name
