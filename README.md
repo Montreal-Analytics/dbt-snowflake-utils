@@ -67,6 +67,21 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 12:00:00 + Initial Run - Using warehouse TRANSFORMING_XL_WH
 ```
 
+### snowflake_utils.clone_schema ([source](macros/warehouse_size.sql))
+This macro clones the source schema into the destination schema.
+
+#### Arguments
+* `source_schema` (required): The source schema name
+* `destination_schema` (required): The destination schema name
+
+#### Usage
+
+Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+
+```
+# for multiple arguments, use the dict syntax
+dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
+```
 ----
 
 ## Contributions
