@@ -86,4 +86,3 @@ dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destinati
 
 ## Contributions
 Contributions to this package are very welcome! Please create issues for bugs or feature requests, or open PRs against `master`.
-
