@@ -1,6 +1,6 @@
 {% macro clone_schema(source_schema, destination_schema) %}
   
-  {% if source_schema is not none and destination_schema is not none %}
+  {% if source_schema and destination_schema %}
     
     {{ log("Cloning existing schema " ~ source_schema ~ " into schema " ~ destination_schema, info=True) }}
     
@@ -13,9 +13,8 @@
 
   {% else %}
     
-    {{ exceptions.raise_compiler_error("Invalid arguments.") }}
+    {{ exceptions.raise_compiler_error("Invalid arguments. Missing source schema and/or destination schema") }}
 
   {% endif %}
 
-  
 {% endmacro %}
