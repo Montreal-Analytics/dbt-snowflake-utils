@@ -67,7 +67,7 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 12:00:00 + Initial Run - Using warehouse TRANSFORMING_XL_WH
 ```
 
-### snowflake_utils.clone_schema ([source](macros/warehouse_size.sql))
+### snowflake_utils.clone_schema ([source](macros/clone_schema.sql))
 This macro clones the source schema into the destination schema.
 
 #### Arguments
