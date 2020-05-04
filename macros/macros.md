@@ -16,6 +16,7 @@ Otherwise, it returns the target warehouse configured in the profile.
 #### Usage
 
 Call the macro from the `snowflake_warehouse` model configuration:
+{% raw %}
 ```
 {{ 
     config(
@@ -23,6 +24,7 @@ Call the macro from the `snowflake_warehouse` model configuration:
     )
 }}
 ```
+{% endraw %}
 
 #### Macro Configuration
 
