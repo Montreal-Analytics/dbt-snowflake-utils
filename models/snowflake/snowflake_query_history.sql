@@ -1,14 +1,18 @@
 {{- config(materialized='incremental', unique_key='query_id')-}}
 {# This job runs to pull data from Snowflake query history. #}
+{% if is_incremental() -%}
 {{-
   config(
-    if is_incremental()
       pre_hook="SET run_start_time = (select greatest(max(end_time),dateadd(minute,-" ~ var('snowflake:max_load_minutes', 4320) ~ ",current_timestamp)) run_time from {{ this }}); "
-    else
-      pre_hook="SET run_start_time = (select dateadd(minute,-" ~ var('snowflake:max_load_minutes', 4320) ~ ",current_timestamp) run_time)"
-    endif
   )
 }}
+{% else -%}
+{{-
+  config(
+      pre_hook="SET run_start_time = (select dateadd(minute,-" ~ var('snowflake:max_load_minutes', 4320) ~ ",current_timestamp) run_time)"
+  )
+}}
+{% endif -%}
     {# pre_hook="SET run_start_time = (dateadd(minute,-4320,current_timestamp)); "  #}
     {# use this row for first run of the table #}
 {#- This statement executes before the DBT create statement does. -#}
