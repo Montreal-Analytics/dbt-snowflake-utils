@@ -13,7 +13,7 @@ macro-paths: ["macros"]
 log-path: "logs"
 
 models:
-  snowflake:
+  snowflake_utils:
     vars:
       'minutes_per_batch' : 30 
       ## Time period to request at once. If over 10,000 queries were run in the time period, Snowflake will return the last 10,000. #}
