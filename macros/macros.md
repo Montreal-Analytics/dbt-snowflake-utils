@@ -26,6 +26,7 @@ Call the macro from the `snowflake_warehouse` model configuration:
 ```
 {% endraw %}
 
+
 #### Macro Configuration
 
 Out-of-the-box, the macro will return the `target.warehouse` for each condition, unless exceptions are configured using one or more of the following [variables](https://docs.getdbt.com/docs/using-variables):
@@ -62,3 +63,4 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 12:00:00 + Initial Run - Using warehouse TRANSFORMING_XL_WH
 ```
 {% enddocs %}
+

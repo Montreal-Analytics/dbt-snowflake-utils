@@ -67,7 +67,7 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 12:00:00 + Initial Run - Using warehouse TRANSFORMING_XL_WH
 ```
 
-### snowflake_utils.clone_schema ([source](macros/warehouse_size.sql))
+### snowflake_utils.clone_schema ([source](macros/clone_schema.sql))
 This macro clones the source schema into the destination schema.
 
 #### Arguments
@@ -83,6 +83,35 @@ Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
 ```
 ----
+## Models
+
+### snowflake_utils.snowflake_query_history
+This model permanently stores an audit trail from your Snowflake QUERY_HISTORY in your environment.
+
+#### Usage
+
+To use the `snowflake_query_history` model, you need to enable it in your `dbt_project.yml` file, along with some base variables.
+
+
+An example `dbt_project.yml` configuration:
+
+```yml
+# dbt_project.yml
+
+...
+
+models:
+  snowflake:
+    enabled: true
+    vars:
+      'snowflake_utils:minutes_per_batch' : 30 
+      ## Time period to request at once. If over 10,000 queries were run in the time period, Snowflake will return the last 10,000. #}
+      'snowflake_utils:max_load_minutes': 4320
+      ## the number of minutes in 3 days - the maximum time to run for.
+      'snowflake_utils:first_run': false
+      ## this must be set to `true` on first run to properly set up the incremental model.
+
+```
 
 ## Contributions
 Contributions to this package are very welcome! Please create issues for bugs or feature requests, or open PRs against `master`.
