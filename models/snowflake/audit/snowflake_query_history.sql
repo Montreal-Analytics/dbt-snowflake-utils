@@ -30,7 +30,7 @@ FROM (
         from table(information_schema.query_history(
           end_time_range_start=>to_timestamp_ltz(dateadd(minute, {{i}}, $run_start_time)),
           end_time_range_end=>dateadd(minute, {{ var('snowflake_utils:minutes_per_batch', 4320) }}, to_timestamp_ltz(dateadd(minute, {{i}}, $run_start_time))), RESULT_LIMIT => 10000))) qh
-      {%- if var('snowflake_utils:max_load_minutes', 30) - i > var('snowflake_utils:minutes_per_batch', 30) %}
+      {%- if var('snowflake_utils:max_load_minutes', 4320) - i > var('snowflake_utils:minutes_per_batch', 30) %}
         UNION ALL
       {% endif -%}
   {%-endif-%}
