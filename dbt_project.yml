@@ -14,12 +14,13 @@ log-path: "logs"
 
 models:
   snowflake_utils:
-    vars:
-      'minutes_per_batch' : 30 
-      ## Time period to request at once. If over 10,000 queries were run in the time period, Snowflake will return the last 10,000. #}
-      'max_load_minutes': 4320
-      ## the number of minutes in 3 days - the maximum time to run for.
     audit:
       materialized: incremental
       optional:
         enabled: false
+      vars:
+        'snowflake_utils:minutes_per_batch' : 30 
+        ## Time period to request at once. If over 10,000 queries were run in the time period, Snowflake will return the last 10,000. #}
+        'snowflake_utils:max_load_minutes': 4320
+        ## the number of minutes in 3 days - the maximum time to run for.
+        'snowflake_utils:first_run': false
