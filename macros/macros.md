@@ -16,6 +16,7 @@ Otherwise, it returns the target warehouse configured in the profile.
 #### Usage
 
 Call the macro from the `snowflake_warehouse` model configuration:
+{% raw %}
 ```
 {{ 
     config(
@@ -23,6 +24,8 @@ Call the macro from the `snowflake_warehouse` model configuration:
     )
 }}
 ```
+{% endraw %}
+
 
 #### Macro Configuration
 
@@ -60,3 +63,4 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 12:00:00 + Initial Run - Using warehouse TRANSFORMING_XL_WH
 ```
 {% enddocs %}
+
