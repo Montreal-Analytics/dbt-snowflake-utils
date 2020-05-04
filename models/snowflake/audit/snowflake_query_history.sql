@@ -3,13 +3,13 @@
 {% if is_incremental() -%}
 {{-
   config(
-      pre_hook="SET run_start_time = (select greatest(max(end_time),dateadd(minute,-" ~ var('snowflake_utils:max_load_minutes', 4320) ~ ",current_timestamp)) run_time from {{ this }}); "
+      pre_hook="SET run_start_time = (select greatest(max(end_time),dateadd(minute,-" ~ var('max_load_minutes', 4320) ~ ",current_timestamp)) run_time from {{ this }}); "
   )
 }}
 {% else -%}
 {{-
   config(
-      pre_hook="SET run_start_time = (select dateadd(minute,-" ~ var('snowflake_utils:max_load_minutes', 4320) ~ ",current_timestamp) run_time)"
+      pre_hook="SET run_start_time = (select dateadd(minute,-" ~ var('max_load_minutes', 4320) ~ ",current_timestamp) run_time)"
   )
 }}
 {% endif -%}
@@ -22,15 +22,15 @@
 
 SELECT *
 FROM (
-{%- for i in range(var('snowflake_utils:max_load_minutes', 4320)) -%}
-  {%- if i % var('snowflake_utils:minutes_per_batch', 30) == 0 -%}
+{%- for i in range(var('max_load_minutes', 4320)) -%}
+  {%- if i % var('minutes_per_batch', 30) == 0 -%}
       SELECT qh.query_id bk_snowflake_query_history, qh.*, current_timestamp as load_datetime
       FROM (
         select *
         from table(information_schema.query_history(
           end_time_range_start=>to_timestamp_ltz(dateadd(minute, {{i}}, $run_start_time)),
-          end_time_range_end=>dateadd(minute, {{ var('snowflake_utils:minutes_per_batch', 4320) }}, to_timestamp_ltz(dateadd(minute, {{i}}, $run_start_time))), RESULT_LIMIT => 10000))) qh
-      {%- if var('snowflake_utils:max_load_minutes', 30) - i > var('snowflake_utils:minutes_per_batch', 30) %}
+          end_time_range_end=>dateadd(minute, {{ var('minutes_per_batch', 4320) }}, to_timestamp_ltz(dateadd(minute, {{i}}, $run_start_time))), RESULT_LIMIT => 10000))) qh
+      {%- if var('max_load_minutes', 30) - i > var('minutes_per_batch', 30) %}
         UNION ALL
       {% endif -%}
   {%-endif-%}
