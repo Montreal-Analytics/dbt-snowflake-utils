@@ -1,0 +1,10 @@
+version: 2
+
+macros:
+  - name: drop_old_relations
+    description: 'This macro deletes all tables and views that have not been modified in a given number of hours'
+    arguments:
+      - name: age_cutoff_in_hours
+        description: The cutoff in hours since last relation modification. Any relation that has not been modified in this many hours is dropped.
+  - name: drop_empty_schemas
+    description: 'This macro drops all schemas in the target database that are empty, except `PUBLIC` and `INFORMATION_SCHEMA`'
