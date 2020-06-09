@@ -88,7 +88,7 @@ This macro drops a schema in the selected database (defaults to target database 
 
 #### Arguments
 * `schema_name` (required): The schema to drop
-* `database` (optional): The database containing the schema
+* `database` (optional): The database name
 
 #### Usage
 
