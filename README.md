@@ -83,6 +83,22 @@ Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
 ```
 
+### snowflake_utils.clone_schema ([source](macros/clone_schema.sql))
+This macro drops a schema in the selected database (defaults to target database if no database is selected).
+
+#### Arguments
+* `schema_name` (required): The schema to drop
+* `database` (optional): The database containing the schema
+
+#### Usage
+
+Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+
+```
+# for multiple arguments, use the dict syntax
+dbt run-operation drop_schema --args "{'schema_name': 'customers_temp', 'database': 'production'}"
+```
+
 ----
 
 ## Contributions
