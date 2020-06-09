@@ -85,7 +85,7 @@ Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
 
 # set the databases
-dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema', 'source_database': 'production', 'destination_database': 'temp'}"
+dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema', 'source_database': 'production', 'destination_database': 'temp_database'}"
 ```
 
 ----
