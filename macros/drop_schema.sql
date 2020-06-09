@@ -1,8 +1,6 @@
-{% macro drop_schema(schema_name, database=None) %}
+{% macro drop_schema(schema_name, database=target.database) %}
 
   {% if schema_name %}
-
-    {% set database = target.database if not database else database %}
 
     {{ log("Dropping schema " ~ database ~ "." ~ schema_name ~ "...", info=True) }}
 
