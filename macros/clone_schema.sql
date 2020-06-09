@@ -1,11 +1,16 @@
-{% macro clone_schema(source_schema, destination_schema) %}
+{% macro clone_schema(source_schema, destination_schema, source_database=None, destination_database=None) %}
   
   {% if source_schema and destination_schema %}
     
-    {{ log("Cloning existing schema " ~ source_schema ~ " into schema " ~ destination_schema, info=True) }}
+    {% set source_database = target.database if not source_database else source_database %}
+    {% set destination_database = target.database if not destination_database else destination_database %}
+
+    {{ (log("Cloning existing schema " ~ source_database ~ "." ~ source_schema ~ 
+    " into schema " ~ destination_database ~ "." ~ destination_schema, info=True)) }}
     
     {% call statement('clone_schema', fetch_result=True, auto_begin=False) -%}
-        CREATE OR REPLACE SCHEMA {{ destination_schema }} CLONE {{ source_schema }}
+        CREATE OR REPLACE SCHEMA {{ destination_database }}.{{ destination_schema }} 
+          CLONE {{ source_database }}.{{ source_schema }}
     {%- endcall %}
     
     {%- set result = load_result('clone_schema') -%}

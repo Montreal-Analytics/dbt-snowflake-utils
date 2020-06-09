@@ -8,5 +8,10 @@ macros:
         description: Source schema name
       - name: destination_schema
         description: Destination schema name
+      - name: source_database
+        description: Source database name (optional)
+      - name: destination_database
+        description: Destination database (optional)
+
   - name: warehouse_size
     description: '{{ doc("warehouse_size") }}'
