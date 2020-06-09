@@ -14,6 +14,6 @@ macros:
       - name: schema_name
         description: Schema to drop
       - name: database
-        description: Optional database name        
+        description: Database name (optional)
   - name: warehouse_size
     description: '{{ doc("warehouse_size") }}'
