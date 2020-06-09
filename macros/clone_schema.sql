@@ -1,9 +1,6 @@
-{% macro clone_schema(source_schema, destination_schema, source_database=None, destination_database=None) %}
+{% macro clone_schema(source_schema, destination_schema, source_database=target.database, destination_database=target.database) %}
   
   {% if source_schema and destination_schema %}
-    
-    {% set source_database = target.database if not source_database else source_database %}
-    {% set destination_database = target.database if not destination_database else destination_database %}
 
     {{ (log("Cloning existing schema " ~ source_database ~ "." ~ source_schema ~ 
     " into schema " ~ destination_database ~ "." ~ destination_schema, info=True)) }}
