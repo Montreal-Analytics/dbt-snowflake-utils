@@ -73,6 +73,8 @@ This macro clones the source schema into the destination schema.
 #### Arguments
 * `source_schema` (required): The source schema name
 * `destination_schema` (required): The destination schema name
+* `source_database` (optional): The source database name
+* `destination_database` (optional): The destination database name
 
 #### Usage
 
@@ -81,6 +83,9 @@ Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 ```
 # for multiple arguments, use the dict syntax
 dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
+
+# set the databases
+dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema', 'source_database': 'production', 'destination_database': 'temp_database'}"
 ```
 
 ### snowflake_utils.drop_schema ([source](macros/drop_schema.sql))

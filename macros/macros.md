@@ -3,6 +3,12 @@ This macro clones a schema to a new location.
 
 To use in the command line:
 dbt run-operation clone_schema --args '{"source_schema": "source_schema_name", "destination_schema": "destination_schema_name"}'
+
+Or:
+
+dbt run-operation clone_schema --args '{"source_schema": "source_schema_name", "destination_schema": "destination_schema_name",
+"source_database": "source_database_name",
+"destination_schema": "destination_schema_name"}'
 {% enddocs %}
 
 {% docs drop_schema %}
