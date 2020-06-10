@@ -11,6 +11,13 @@ dbt run-operation clone_schema --args '{"source_schema": "source_schema_name", "
 "destination_schema": "destination_schema_name"}'
 {% enddocs %}
 
+{% docs drop_schema %}
+This macro drops a schema in the selected database (defaults to target database if no database is selected).
+
+To use in the command line:
+dbt run-operation drop_schema --args '{"schema_name": "schema_to_drop", "database": "database_name"}'
+{% enddocs %}
+
 {% docs warehouse_size %}
 This macro returns an alternative warehouse if conditions are met. It will, in order, check the following conditions for incremental models:
 

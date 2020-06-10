@@ -12,6 +12,14 @@ macros:
         description: Source database name (optional). Defaults to target database.
       - name: destination_database
         description: Destination database (optional). Defaults to target database.
-
+        
+  - name: drop_schema
+    description: '{{ doc("drop_schema") }}'
+    arguments:
+      - name: schema_name
+        description: Schema to drop
+      - name: database
+        description: Database name (optional). Defaults to target database.
+        
   - name: warehouse_size
     description: '{{ doc("warehouse_size") }}'
