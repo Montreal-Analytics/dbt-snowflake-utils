@@ -24,7 +24,7 @@ Otherwise, it returns the target warehouse configured in the profile.
 
 Call the macro from the `snowflake_warehouse` model configuration:
 ```
-{{ 
+{{
     config(
       snowflake_warehouse=snowflake_utils.warehouse_size()
     )
@@ -62,7 +62,7 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 
 ```
 12:00:00 | Concurrency: 16 threads (target='dev')
-12:00:00 | 
+12:00:00 |
 12:00:00 | 1 of 1 START incremental model DBT_MGUINDON.fct_orders... [RUN]
 12:00:00 + Initial Run - Using warehouse TRANSFORMING_XL_WH
 ```
@@ -86,6 +86,27 @@ dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destinati
 
 # set the databases
 dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema', 'source_database': 'production', 'destination_database': 'temp_database'}"
+```
+
+### snowflake_utils.clone_database ([source](macros/clone_database.sql))
+This macro clones the source database into the destination database.  The destination database must already exist.  Existing tables in the target will be replaced if already present, but will not be dropped if they no longer exist in the source database.
+
+
+#### Arguments
+* `source_database` (required): The source database name
+* `destination_database` (required): The destination database name
+* `exclude_schemas` (optional): List of schemas to exclude from cloning
+
+#### Usage
+
+Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+
+```
+dbt run-operation clone_database --args "{'source_database': 'production', 'destination_database': 'temp_database'}"
+
+# Excluding schemas
+dbt run-operation clone_database --args "{'source_database': 'production', 'destination_database': 'temp_database', 'exclude_schemas': ['large_legacy_data', 'large_legacy_data2']}"
+
 ```
 
 ### snowflake_utils.drop_schema ([source](macros/drop_schema.sql))
