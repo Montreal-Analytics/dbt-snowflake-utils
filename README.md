@@ -39,6 +39,7 @@ Out-of-the-box, the macro will return the `target.warehouse` for each condition,
 |----------|-------------|:--------:|
 |snowflake_utils:initial_run_warehouse|Alternative warehouse when the relation doesn't exist|No|
 |snowflake_utils:full_refresh_run_warehouse|Alternative warehouse when doing a `--full-refresh`|No|
+|snowflake_utils:incremental_run_warehouse|Default warehouse for incremental runs|No|
 
 An example `dbt_project.yml` configuration:
 
