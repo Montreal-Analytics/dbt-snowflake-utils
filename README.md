@@ -6,7 +6,7 @@ This [dbt](https://github.com/fishtown-analytics/dbt) package contains Snowflake
 Check [dbt Hub](https://hub.getdbt.com/montreal-analytics/snowflake_utils/latest/) for the latest installation instructions, or [read the docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 
 ## Prerequisites
-Snowflake Utils is compatible with dbt 0.15.0 and later.
+Snowflake Utils is compatible with dbt 0.20.0 and later.
 
 ----
 
@@ -47,14 +47,10 @@ An example `dbt_project.yml` configuration:
 # dbt_project.yml
 
 ...
-
-models:
-    my_project:
-        vars:
-            'snowflake_utils:initial_run_warehouse': "transforming_xl_wh"
-            'snowflake_utils:full_refresh_run_warehouse': "transforming_xl_wh"
-
-
+vars:
+    'snowflake_utils:initial_run_warehouse': "transforming_xl_wh"
+    'snowflake_utils:full_refresh_run_warehouse': "transforming_xl_wh"
+    'snowflake_utils:incremental_run_warehouse': "transforming_m_wh"
 ```
 
 #### Console Output
