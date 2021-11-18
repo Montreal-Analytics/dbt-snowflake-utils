@@ -9,17 +9,23 @@
     {#-- use alternative warehouse if full-refresh run #}
     {# if relation is not none and flags.FULL_REFRESH and full_wh is not none #}
     {% if flags.FULL_REFRESH and full_wh is not none %}
-        {{ dbt_utils.log_info("Full Refresh Run - Using alternative warehouse " ~ full_wh | upper) }}
+        {% if execute %}
+            {{ dbt_utils.log_info("Full Refresh Run - Using alternative warehouse " ~ full_wh | upper) }}
+        {% endif %}
         {% do return(full_wh) %}
 
     {#-- use alternative warehouse if incremental run #}
     {% elif relation is not none and flags.FULL_REFRESH == False and inc_wh is not none %}
-        {{ dbt_utils.log_info("Incremental Run - Using alternative warehouse " ~ inc_wh | upper) }}
+        {% if execute %}
+            {{ dbt_utils.log_info("Incremental Run - Using alternative warehouse " ~ inc_wh | upper) }}
+        {% endif %}
         {% do return(inc_wh) %}
 
     {#-- use alternative warehouse if initial run #}
     {% elif relation is none and initial_wh is not none %}
-        {{ dbt_utils.log_info("Initial Run - Using alternative warehouse " ~ initial_wh | upper) }}
+        {% if execute %} 
+            {{ dbt_utils.log_info("Initial Run - Using alternative warehouse " ~ initial_wh | upper) }}
+        {% endif %}
         {% do return(initial_wh) %}
 
     {#-- use target warehouse if variable not configured for a condition #}

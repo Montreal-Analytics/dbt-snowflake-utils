@@ -1,6 +1,6 @@
 # Snowflake Utils
 
-This [dbt](https://github.com/fishtown-analytics/dbt) package contains Snowflake-specific macros that can be (re)used across dbt projects.
+This [dbt](https://github.com/dbt-labs/dbt-core) package contains Snowflake-specific macros that can be (re)used across dbt projects.
 
 ## Installation Instructions
 Check [dbt Hub](https://hub.getdbt.com/montreal-analytics/snowflake_utils/latest/) for the latest installation instructions, or [read the docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
@@ -15,8 +15,9 @@ Snowflake Utils is compatible with dbt 0.20.0 and later.
 ### snowflake_utils.warehouse_size() ([source](macros/warehouse_size.sql))
 This macro returns an alternative warehouse if conditions are met. It will, in order, check the following conditions for incremental models:
 
-- The relation doesn't exist (initial run) _and_ a warehouse has been configured
 - Full refresh run _and_ a warehouse has been configured
+- Incremental run _and_ a warehouse has been configured
+- The relation doesn't exist (initial run) _and_ a warehouse has been configured
 
 Otherwise, it returns the target warehouse configured in the profile.
 
@@ -63,6 +64,8 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 12:00:00 | 1 of 1 START incremental model DBT_MGUINDON.fct_orders... [RUN]
 12:00:00 + Initial Run - Using warehouse TRANSFORMING_XL_WH
 ```
+#### Known Issues
+When compiling or generating docs, the console reports that dbt is using the incremental run warehouse. It isn't actually so. During these operations, only the target warehouse is activated.
 
 ### snowflake_utils.clone_schema ([source](macros/clone_schema.sql))
 This macro clones the source schema into the destination schema.
