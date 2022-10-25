@@ -137,7 +137,7 @@ Its columns ACCOUNT_NAME and ACCOUNT_NUMBER will both have the tag 'accounting_c
 
 The macro must be called as part of on-run-end, so add the following to dbt_project.yml:
 ```
-on-run-end: "{{ apply_meta_as_tags(results) }}"
+on-run-end: "{{ snowflake_utils.apply_meta_as_tags(results) }}"
 ```
 
 
