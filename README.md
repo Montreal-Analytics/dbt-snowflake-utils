@@ -104,6 +104,43 @@ Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 dbt run-operation drop_schema --args "{'schema_name': 'customers_temp', 'database': 'production'}"
 ```
 
+### snowflake_utils.apply_meta_as_tags ([source](macros/apply_meta_as_tags.sql))
+This macro applies specific model meta properties as Snowflake tags during on-run-end. This allows you to author Snowflake tags as part of your dbt project.
+
+#### Arguments
+* `results` (required): The [on-run-end context object](https://docs.getdbt.com/reference/dbt-jinja-functions/on-run-end-context).
+
+#### Usage
+
+First, configure your dbt model to have the 'database_tags' meta property as shown (tag examples borrowed from [here](https://docs.snowflake.com/en/user-guide/tag-based-masking-policies.html)):
+
+```
+schema.yma
+
+models:
+  - name: ACCOUNT
+    config:
+      meta:
+        database_tags:
+          accounting_row_string: a
+
+    columns:
+      - name: ACCOUNT_NAME
+        meta:
+          database_tags:
+            accounting_col_string: b
+```
+
+The above means:
+The Snowflake table ACCOUNT will have the tag 'accounting_row_string' set to the value 'visible'.
+Its columns ACCOUNT_NAME and ACCOUNT_NUMBER will both have the tag 'accounting_col_string' set to the value 'visible'
+
+The macro must be called as part of on-run-end, so add the following to dbt_project.yml:
+```
+on-run-end: "{{ apply_meta_as_tags(results) }}"
+```
+
+
 ----
 
 ## Contributions
