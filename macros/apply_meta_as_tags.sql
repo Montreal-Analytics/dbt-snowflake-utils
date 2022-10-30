@@ -2,10 +2,13 @@
   {{ log('apply_meta_as_tags', info=True) }}
   {{ log(results) }}
   {% if execute %}
-    
+    {# 
+    -- The tags_by_schema object will act as a local cache of Snowflake tags.
+    -- This means we only need to call "show tags in <schema>" once per schema we process.
+    #}
     {%- set tags_by_schema = {} -%}
     {% for res in results -%}
-        {% if res.node.meta.database_tags %}
+        {% if model_contains_tag_meta(res.node) %}
             
             {%- set model_database = res.node.database -%}
             {%- set model_schema = res.node.schema -%}
@@ -34,20 +37,19 @@
                 materialized: {{ res.node.config.materialized }}
             {%- endset %}
             {{ log(line, info=True) }}
-
+            {#
+            -- Uses the tag_references_all_columns table function to fetch existing tags for the table
+            #}
             {%- call statement('main', fetch_result=True) -%}
-                select LEVEL,UPPER(TAG_NAME) as TAG_NAME,TAG_VALUE from table(information_schema.tag_references_all_columns('{{model_alias}}', 'table'))
+                select LEVEL,OBJECT_NAME,COLUMN_NAME,UPPER(TAG_NAME) as TAG_NAME,TAG_VALUE from table(information_schema.tag_references_all_columns('{{model_alias}}', 'table'))
             {%- endcall -%}
             {%- set existing_tags_for_table = load_result('main')['data'] -%}
             {{ log('Existing tags for table:', info=True) }}
             {{ log(existing_tags_for_table, info=True) }}
 
-            {{ log('--', info=True) }}
             {% for table_tag in res.node.meta.database_tags %}
-
                 {{ create_tag_if_missing(current_tags_in_schema,table_tag|upper) }}
                 {% set desired_tag_value = res.node.meta.database_tags[table_tag] %}
-
                 {{set_table_tag_value_if_different(model_alias,table_tag,desired_tag_value,existing_tags_for_table)}}
             {% endfor %}
             {% for column in res.node.columns %}
@@ -64,22 +66,57 @@
   {% endif %}
 {% endmacro %}
 
+{# 
+-- Given a node in a Result object, returns True if either the model meta contains database_tags, 
+-- or any of the column's meta contains database_tags.
+-- Otherwise it returns False
+#}
+{% macro model_contains_tag_meta(model_node) %}
+	{% if model_node.meta.database_tags %}
+        {{ return(True) }}
+	{% endif %}
+    {% for column in model_node.columns %}
+        {% if model_node.columns[column].meta.database_tags %}
+            {{ return(True) }}
+    	{% endif %}
+    {% endfor %}
+    {{ return(False) }}
+{% endmacro %}
 
-{% macro create_tag_if_missing(all_tag_names,table_tag) %}
-	{% if table_tag not in all_tag_names %}
-		{{ log('Creating missing tag '+table_tag, info=True) }}
+{# 
+-- Snowflake tags must exist before they are used.
+-- Given a list of all the existing tags in the account (all_tag_names), 
+-- checks if the new tag (new_tag) is already in the list and
+-- creates it in Snowflake if it doesn't.
+#}
+{% macro create_tag_if_missing(all_tag_names,new_tag) %}
+	{% if new_tag not in all_tag_names %}
+		{{ log('Creating missing tag '+new_tag, info=True) }}
         {%- call statement('main', fetch_result=True) -%}
-            create tag {{table_tag}}
+            create tag {{new_tag}}
         {%- endcall -%}
+        {{ all_tag_names.append(new_tag)}}
 		{{ log(load_result('main').data, info=True) }}
 	{% else %}
-		{{ log('Tag already exists: '+table_tag, info=True) }}
+		{{ log('Tag already exists: '+new_tag, info=True) }}
 	{% endif %}
 {% endmacro %}
 
+-- select LEVEL,OBJECT_NAME,COLUMN_NAME,UPPER(TAG_NAME) as TAG_NAME,TAG_VALUE
+{# 
+-- Updates the value of a Snowflake table tag, if the provided value is different.
+-- existing_tags contains the results from querying tag_references_all_columns. 
+-- The first column (attribute '0') contains 'TABLE' or 'COLUMN', since we're looking
+-- at table tags here then we include only 'TABLE' values.
+-- The second column (attribute '1') contains the name of the table, we filter on that.
+-- The third column (attribute '2') contains the name of the column, not relevant here.
+-- The second column (attribute '3') contains the tag name, so we filter on that too.
+-- The third column contains the value of the tag, so we compare with the desired_tag_value
+-- to see if we need to update it
+#}
 {% macro set_table_tag_value_if_different(table_name,tag_name,desired_tag_value,existing_tags) %}
     {{ log('Ensuring tag '+tag_name+' has value '+desired_tag_value+' at table level', info=True) }}
-    {%- set existing_tag_for_table = existing_tags|selectattr('0','equalto','TABLE')|selectattr('1','equalto',tag_name|upper)|list -%}
+    {%- set existing_tag_for_table = existing_tags|selectattr('0','equalto','TABLE')|selectattr('1','equalto',table_name)|selectattr('3','equalto',tag_name|upper)|list -%}
     {{ log('Filtered tags for table:', info=True) }}
     {{ log(existing_tag_for_table[0], info=True) }}
     {% if existing_tag_for_table|length > 0 and existing_tag_for_table[0][2]==desired_tag_value %}
@@ -92,10 +129,20 @@
         {{ log(load_result('main').data, info=True) }}
     {% endif %}
 {% endmacro %}
-
+{# 
+-- Updates the value of a Snowflake column tag, if the provided value is different.
+-- existing_tags contains the results from querying tag_references_all_columns. 
+-- The first column (attribute '0') contains 'TABLE' or 'COLUMN', since we're looking
+-- at column tags here then we include only 'COLUMN' values.
+-- The second column (attribute '1') contains the name of the table, we filter on that.
+-- The third column (attribute '2') contains the name of the column, we filter on that.
+-- The second column (attribute '3') contains the tag name, so we filter on that too.
+-- The third column contains the value of the tag, so we compare with the desired_tag_value
+-- to see if we need to update it
+#}
 {% macro set_column_tag_value_if_different(table_name,column_name,tag_name,desired_tag_value,existing_tags) %}
     {{ log('Ensuring tag '+tag_name+' has value '+desired_tag_value+' at column level', info=True) }}
-    {%- set existing_tag_for_column = existing_tags|selectattr('0','equalto','COLUMN')|selectattr('1','equalto',tag_name|upper)|list -%}
+    {%- set existing_tag_for_column = existing_tags|selectattr('0','equalto','COLUMN')|selectattr('1','equalto',table_name)|selectattr('2','equalto',column_name)|selectattr('3','equalto',tag_name|upper)|list -%}
     {{ log('Filtered tags for column:', info=True) }}
     {{ log(existing_tag_for_column[0], info=True) }}
     {% if existing_tag_for_column|length > 0 and existing_tag_for_column[0][2]==desired_tag_value %}

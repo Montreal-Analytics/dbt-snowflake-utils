@@ -140,6 +140,11 @@ The macro must be called as part of on-run-end, so add the following to dbt_proj
 on-run-end: "{{ snowflake_utils.apply_meta_as_tags(results) }}"
 ```
 
+#### Tag removal
+This macro only seeks to add or update the tags which are specified in dbt. It won't delete tags which are not defined.
+If you need this behaviour, it usually comes naturally as dbt drops and recreates tables/views for most materializations.
+If you are using the incremental materialization, be aware of this limitation.
+
 
 ----
 
