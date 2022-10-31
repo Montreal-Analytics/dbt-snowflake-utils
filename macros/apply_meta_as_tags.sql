@@ -50,14 +50,14 @@
             {% for table_tag in res.node.meta.database_tags %}
                 {{ create_tag_if_missing(current_tags_in_schema,table_tag|upper) }}
                 {% set desired_tag_value = res.node.meta.database_tags[table_tag] %}
-                {{set_table_tag_value_if_different(model_alias,table_tag,desired_tag_value,existing_tags_for_table)}}
+                {{set_table_tag_value_if_different(model_alias|upper,table_tag,desired_tag_value,existing_tags_for_table)}}
             {% endfor %}
             {% for column in res.node.columns %}
                 {% for column_tag in res.node.columns[column].meta.database_tags %}
                     {{log(column_tag,info=True)}}
                     {{create_tag_if_missing(current_tags_in_schema,column_tag|upper)}}
                     {% set desired_tag_value = res.node.columns[column].meta.database_tags[column_tag] %}
-                    {{set_column_tag_value_if_different(model_alias,column,column_tag,desired_tag_value,existing_tags_for_table)}}
+                    {{set_column_tag_value_if_different(model_alias|upper,column|upper,column_tag,desired_tag_value,existing_tags_for_table)}}
                 {% endfor %}
             {% endfor %}
             {{ log("========== Finished processing tags for "+model_alias+" ==========", info=True) }}
@@ -110,16 +110,17 @@
 -- at table tags here then we include only 'TABLE' values.
 -- The second column (attribute '1') contains the name of the table, we filter on that.
 -- The third column (attribute '2') contains the name of the column, not relevant here.
--- The second column (attribute '3') contains the tag name, so we filter on that too.
--- The third column contains the value of the tag, so we compare with the desired_tag_value
+-- The fourth column (attribute '3') contains the tag name, so we filter on that too.
+-- The fifth column (index 4) contains the value of the tag, so we compare with the desired_tag_value
 -- to see if we need to update it
 #}
 {% macro set_table_tag_value_if_different(table_name,tag_name,desired_tag_value,existing_tags) %}
     {{ log('Ensuring tag '+tag_name+' has value '+desired_tag_value+' at table level', info=True) }}
-    {%- set existing_tag_for_table = existing_tags|selectattr('0','equalto','TABLE')|selectattr('1','equalto',table_name)|selectattr('3','equalto',tag_name|upper)|list -%}
+    {{ log(existing_tags, info=True) }}
+    {%- set existing_tag_for_table = existing_tags|selectattr('0','equalto','TABLE')|selectattr('1','equalto',table_name|upper)|selectattr('3','equalto',tag_name|upper)|list -%}
     {{ log('Filtered tags for table:', info=True) }}
-    {{ log(existing_tag_for_table[0], info=True) }}
-    {% if existing_tag_for_table|length > 0 and existing_tag_for_table[0][2]==desired_tag_value %}
+    {{ log(existing_tag_for_table, info=True) }}
+    {% if existing_tag_for_table|length > 0 and existing_tag_for_table[0][4]==desired_tag_value %}
         {{ log('Correct tag value already exists', info=True) }}
     {% else %}
         {{ log('Setting tag value for '+tag_name+' to value '+desired_tag_value, info=True) }}
@@ -136,16 +137,16 @@
 -- at column tags here then we include only 'COLUMN' values.
 -- The second column (attribute '1') contains the name of the table, we filter on that.
 -- The third column (attribute '2') contains the name of the column, we filter on that.
--- The second column (attribute '3') contains the tag name, so we filter on that too.
--- The third column contains the value of the tag, so we compare with the desired_tag_value
+-- The fourth column (attribute '3') contains the tag name, so we filter on that too.
+-- The fifth column (index 4) contains the value of the tag, so we compare with the desired_tag_value
 -- to see if we need to update it
 #}
 {% macro set_column_tag_value_if_different(table_name,column_name,tag_name,desired_tag_value,existing_tags) %}
     {{ log('Ensuring tag '+tag_name+' has value '+desired_tag_value+' at column level', info=True) }}
-    {%- set existing_tag_for_column = existing_tags|selectattr('0','equalto','COLUMN')|selectattr('1','equalto',table_name)|selectattr('2','equalto',column_name)|selectattr('3','equalto',tag_name|upper)|list -%}
+    {%- set existing_tag_for_column = existing_tags|selectattr('0','equalto','COLUMN')|selectattr('1','equalto',table_name|upper)|selectattr('2','equalto',column_name|upper)|selectattr('3','equalto',tag_name|upper)|list -%}
     {{ log('Filtered tags for column:', info=True) }}
-    {{ log(existing_tag_for_column[0], info=True) }}
-    {% if existing_tag_for_column|length > 0 and existing_tag_for_column[0][2]==desired_tag_value %}
+    {{ log(existing_tag_for_column, info=True) }}
+    {% if existing_tag_for_column|length > 0 and existing_tag_for_column[0][4]==desired_tag_value %}
         {{ log('Correct tag value already exists', info=True) }}
     {% else %}
         {{ log('Setting tag value for '+tag_name+' to value '+desired_tag_value, info=True) }}
