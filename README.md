@@ -115,7 +115,7 @@ This macro applies specific model meta properties as Snowflake tags during on-ru
 First, configure your dbt model to have the 'database_tags' meta property as shown (tag examples borrowed from [here](https://docs.snowflake.com/en/user-guide/tag-based-masking-policies.html)):
 
 ```
-schema.yma
+schema.yml
 
 models:
   - name: ACCOUNT
