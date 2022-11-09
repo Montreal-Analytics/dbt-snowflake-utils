@@ -23,3 +23,9 @@ macros:
         
   - name: warehouse_size
     description: '{{ doc("warehouse_size") }}'
+
+  - name: apply_meta_as_tags
+    description: '{{ doc("apply_meta_as_tags") }}'
+    arguments:
+      - name: results
+        description: The on-run-end context object

@@ -77,3 +77,50 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 ```
 {% enddocs %}
 
+{% docs apply_meta_as_tags %}
+This macro applies specific model meta properties as Snowflake tags during on-run-end. This allows you to author Snowflake tags as part of your dbt project.
+
+This macro applies specific model meta properties as Snowflake tags during on-run-end. This allows you to author Snowflake tags as part of your dbt project.
+
+#### Arguments
+* `results` (required): The [on-run-end context object](https://docs.getdbt.com/reference/dbt-jinja-functions/on-run-end-context).
+
+#### Usage
+
+First, configure your dbt model to have the 'database_tags' meta property as shown (tag examples borrowed from [here](https://docs.snowflake.com/en/user-guide/tag-based-masking-policies.html)):
+{% raw %}
+```
+schema.yml
+
+models:
+  - name: ACCOUNT
+    config:
+      meta:
+        database_tags:
+          accounting_row_string: a
+
+    columns:
+      - name: ACCOUNT_NAME
+        meta:
+          database_tags:
+            accounting_col_string: b
+```
+{% endraw %}
+
+The above means:
+The Snowflake table ACCOUNT will have the tag 'accounting_row_string' set to the value 'visible'.
+Its columns ACCOUNT_NAME and ACCOUNT_NUMBER will both have the tag 'accounting_col_string' set to the value 'visible'
+
+The macro must be called as part of on-run-end, so add the following to dbt_project.yml:
+{% raw %}
+```
+on-run-end: "{{ snowflake_utils.apply_meta_as_tags(results) }}"
+```
+{% endraw %}
+
+#### Tag removal
+This macro only seeks to add or update the tags which are specified in dbt. It won't delete tags which are not defined.
+If you need this behaviour, it usually comes naturally as dbt drops and recreates tables/views for most materializations.
+If you are using the incremental materialization, be aware of this limitation.
+
+{% enddocs %}
