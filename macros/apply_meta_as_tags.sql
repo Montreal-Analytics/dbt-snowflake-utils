@@ -30,10 +30,14 @@
             {{ log('current_tags_in_schema:', info=True) }}
             {{ log(current_tags_in_schema, info=True) }}
             {{ log("========== Processing tags for "+model_schema_full+"."+model_alias+" ==========", info=True) }}
-
+            {% if res.node.meta %}
+                {%- set model_meta = res.node.meta -%}
+            {% else %}
+                {%- set model_meta = res.node.config.meta -%}
+            {% endif%}
             {% set line -%}
                 node: {{ res.node.unique_id }}; status: {{ res.status }} (message: {{ res.message }})
-                database tags: {{ res.node.meta.database_tags}}
+                model level database tags: {{ model_meta.database_tags}}
                 materialized: {{ res.node.config.materialized }}
             {%- endset %}
             {{ log(line, info=True) }}
@@ -47,9 +51,9 @@
             {{ log('Existing tags for table:', info=True) }}
             {{ log(existing_tags_for_table, info=True) }}
 
-            {% for table_tag in res.node.meta.database_tags %}
+            {% for table_tag in model_meta.database_tags %}
                 {{ create_tag_if_missing(current_tags_in_schema,table_tag|upper) }}
-                {% set desired_tag_value = res.node.meta.database_tags[table_tag] %}
+                {% set desired_tag_value = model_meta.database_tags[table_tag] %}
                 {{set_table_tag_value_if_different(model_alias|upper,table_tag,desired_tag_value,existing_tags_for_table)}}
             {% endfor %}
             {% for column in res.node.columns %}
@@ -73,6 +77,12 @@
 #}
 {% macro model_contains_tag_meta(model_node) %}
 	{% if model_node.meta.database_tags %}
+        {{ return(True) }}
+	{% endif %}
+    {# 
+    -- For compatibility with the old results structure
+    #}
+    {% if model_node.config.meta.database_tags %}
         {{ return(True) }}
 	{% endif %}
     {% for column in model_node.columns %}
