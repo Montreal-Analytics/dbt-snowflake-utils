@@ -8,12 +8,20 @@
     #}
     {%- set tags_by_schema = {} -%}
     {% for res in results -%}
-        {% if model_contains_tag_meta(res.node) %}
+        {% if snowflake_utils.model_contains_tag_meta(res.node) %}
             
             {%- set model_database = res.node.database -%}
             {%- set model_schema = res.node.schema -%}
             {%- set model_schema_full = model_database+'.'+model_schema -%}
             {%- set model_alias = res.node.alias -%}
+
+            {%- call statement('set_database', fetch_result=True) -%}
+                USE DATABASE {{model_database}}
+            {%- endcall -%}
+
+            {%- call statement('set_schema', fetch_result=True) -%}
+                USE SCHEMA {{model_schema}}
+            {%- endcall -%}
 
             {% if model_schema_full not in tags_by_schema.keys() %}
                 {{ log('need to fetch tags for schema '+model_schema_full, info=True) }}
@@ -39,6 +47,8 @@
                 node: {{ res.node.unique_id }}; status: {{ res.status }} (message: {{ res.message }})
                 model level database tags: {{ model_meta.database_tags}}
                 materialized: {{ res.node.config.materialized }}
+                database: {{ model_database }}
+                schema: {{ model_schema }}
             {%- endset %}
             {{ log(line, info=True) }}
             {#
@@ -52,22 +62,24 @@
             {{ log(existing_tags_for_table, info=True) }}
 
             {% for table_tag in model_meta.database_tags %}
-                {{ create_tag_if_missing(current_tags_in_schema,table_tag|upper) }}
+                {{ snowflake_utils.create_tag_if_missing(current_tags_in_schema,table_tag|upper) }}
                 {% set desired_tag_value = model_meta.database_tags[table_tag] %}
-                {{set_table_tag_value_if_different(model_alias|upper,table_tag,desired_tag_value,existing_tags_for_table)}}
+                {{ snowflake_utils.set_table_tag_value_if_different(model_alias|upper,table_tag,desired_tag_value,existing_tags_for_table) }}
             {% endfor %}
             {% for column in res.node.columns %}
                 {% for column_tag in res.node.columns[column].meta.database_tags %}
                     {{log(column_tag,info=True)}}
-                    {{create_tag_if_missing(current_tags_in_schema,column_tag|upper)}}
+                    {{ snowflake_utils.create_tag_if_missing(current_tags_in_schema,column_tag|upper)}}
                     {% set desired_tag_value = res.node.columns[column].meta.database_tags[column_tag] %}
-                    {{set_column_tag_value_if_different(model_alias|upper,column|upper,column_tag,desired_tag_value,existing_tags_for_table)}}
+                    {{ snowflake_utils.set_column_tag_value_if_different(model_alias|upper,column|upper,column_tag,desired_tag_value,existing_tags_for_table)}}
                 {% endfor %}
             {% endfor %}
             {{ log("========== Finished processing tags for "+model_alias+" ==========", info=True) }}
         {% endif %}
     {% endfor %}
   {% endif %}
+  -- Need to return something other than None, since DBT will try to execute it as SQL statement
+  {{ return('') }}
 {% endmacro %}
 
 {# 
