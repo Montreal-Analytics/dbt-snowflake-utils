@@ -20,3 +20,17 @@
   {% endif %}
 
 {% endmacro %}
+
+{% macro clone_schema_with_new_owner(
+  new_owner_role,
+  source_schema,
+  destination_schema,
+  source_database=target.database,
+  destination_database=target.database
+) %}
+
+{{ clone_schema(source_schema, destination_schema, source_database, destination_database) }}
+
+{{ grant_ownership_schema_cascade(new_owner_role, destination_schema, destination_database) }}
+
+{% endmacro %}

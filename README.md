@@ -6,7 +6,7 @@ This [dbt](https://github.com/dbt-labs/dbt-core) package contains Snowflake-spec
 Check [dbt Hub](https://hub.getdbt.com/montreal-analytics/snowflake_utils/latest/) for the latest installation instructions, or [read the docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 
 ## Prerequisites
-Snowflake Utils is compatible with dbt 0.20.0 and later.
+Snowflake Utils is compatible with dbt 1.1.0 and later.
 
 ----
 
@@ -68,6 +68,8 @@ When a variable is configured for a conditon _and_ that condition is matched whe
 When compiling or generating docs, the console reports that dbt is using the incremental run warehouse. It isn't actually so. During these operations, only the target warehouse is activated.
 
 ### snowflake_utils.clone_schema ([source](macros/clone_schema.sql))
+This macro is a part of the recommended 2-step Cloning Pattern for dbt development, explained in detail [here](2-step_cloning_pattern.md).
+
 This macro clones the source schema into the destination schema.
 
 #### Arguments
@@ -82,10 +84,75 @@ Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 
 ```
 # for multiple arguments, use the dict syntax
-dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
+dbt run-operation clone_schema \
+  --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
 
 # set the databases
-dbt run-operation clone_schema --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema', 'source_database': 'production', 'destination_database': 'temp_database'}"
+dbt run-operation clone_schema \
+  --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema', 'source_database': 'production', 'destination_database': 'temp_database'}"
+```
+
+### snowflake_utils.clone_schema_with_new_owner ([source](macros/clone_schema.sql))
+This macro is a part of the recommended 2-step Cloning Pattern for dbt development, explained in detail [here](2-step_cloning_pattern.md).
+
+This macro clones the source schema into the destination schema and grants ownership over it and its tables and views to a new owner. This macro wraps around the clone_schema and grant_ownership_schema_cascade macros.
+
+#### Arguments
+* `new_owner_role` (required): The new ownership role name
+* `source_schema` (required): The source schema name
+* `destination_schema` (required): The destination schema name
+* `source_database` (optional): The source database name
+* `destination_database` (optional): The destination database name
+
+#### Usage
+
+Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+
+```
+# for multiple arguments, use the dict syntax
+dbt run-operation clone_schema_with_new_owner \
+  --args "{'new_owner_role': 'developer_role', 'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
+
+# set the databases
+dbt run-operation clone_schema_with_new_owner \
+  --args "{'new_owner_role': 'developer_role', 'source_schema': 'analytics', 'destination_schema': 'ci_schema', 'source_database': 'production', 'destination_database': 'temp_database'}"
+```
+
+### snowflake_utils.clone_database ([source](macros/clone_database.sql))
+This macro is a part of the recommended 2-step Cloning Pattern for dbt development, explained in detail [here](2-step_cloning_pattern.md).
+
+This macro clones the source database into the destination database.
+
+#### Arguments
+* `source_database` (required): The source database name
+* `destination_database` (required): The destination database name
+
+#### Usage
+
+Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+
+```
+dbt run-operation clone_database \
+  --args "{'source_database': 'production_clone', 'destination_database': 'developer_clone_me'}"
+```
+
+### snowflake_utils.clone_database_with_new_owner ([source](macros/clone_database.sql))
+This macro is a part of the recommended 2-step Cloning Pattern for dbt development, explained in detail [here](2-step_cloning_pattern.md).
+
+This macro clones the source database into the destination database and grants ownership over it, its schemata, and its schemata's tables and views to a new owner. This macro wraps around the clone_database and grant_ownership_schema_cascade macros.
+
+#### Arguments
+* `new_owner_role` (required): The new ownership role name
+* `source_database` (required): The source database name
+* `destination_database` (required): The destination database name
+
+#### Usage
+
+Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+
+```
+dbt run-operation clone_database_with_new_owner \
+  --args "{'new_owner_role': 'developer_role', 'source_database': 'production', 'destination_database': 'production_clone'}"
 ```
 
 ### snowflake_utils.drop_schema ([source](macros/drop_schema.sql))
@@ -101,8 +168,37 @@ Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 
 ```
 # for multiple arguments, use the dict syntax
-dbt run-operation drop_schema --args "{'schema_name': 'customers_temp', 'database': 'production'}"
+dbt run-operation drop_schema \
+  --args "{'schema_name': 'customers_temp', 'database': 'production'}"
 ```
+
+### snowflake_utils.drop_database ([source](macros/drop_database.sql))
+This macro drops a database.
+
+#### Arguments
+* `database_name` (required): The database name
+
+#### Usage
+
+Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
+
+```
+# for multiple arguments, use the dict syntax
+dbt run-operation drop_database \
+  --args "{'database_name': 'production_clone'}"
+```
+
+### snowflake_utils.grant_ownership_schema_cascade ([source](macros/grant_ownership_schema_cascade.sql))
+This macro grants ownership over a schema and its tables and views. It is called by the clone_schema_with_new_owner and clone_database_with_new_owner macros above.
+
+#### Arguments
+* `new_owner_role` (required): The new ownership role name
+* `destination_schema` (required): The destination schema name
+* `destination_database` (optional): The destination database name
+
+#### Usage
+
+It is not recommended to call this macro on its own. This macro is intended to be called by a wrapping macro, namely clone_schema_with_new_owner or clone_database_with_new_owner.
 
 ### snowflake_utils.apply_meta_as_tags ([source](macros/apply_meta_as_tags.sql))
 This macro applies specific model meta properties as Snowflake tags during on-run-end. This allows you to author Snowflake tags as part of your dbt project.

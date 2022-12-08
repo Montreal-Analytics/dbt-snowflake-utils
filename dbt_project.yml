@@ -1,11 +1,10 @@
 name: 'snowflake_utils'
-version: '0.3.0'
+version: '0.4.0'
 
 config-version: 2
 
-require-dbt-version: ">=0.17.0"
+require-dbt-version: ">=1.1.0"
 
-source-paths: ["models"]
 target-path: "target"
 clean-targets: ["target", "dbt_modules"]
 test-paths: ["test"]
