@@ -1,3 +1,6 @@
+{#
+-- This macro drops a database.
+#}
 {% macro drop_database(database_name) %}
 
   {% if database_name %}

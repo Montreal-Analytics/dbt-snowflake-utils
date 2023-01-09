@@ -1,4 +1,10 @@
-{% macro clone_database(source_database, destination_database) %}
+{#
+-- This macro clones the source database into the destination database.
+#}
+{% macro clone_database(
+  source_database,
+  destination_database
+) %}
   
   {% if source_database and destination_database %}
 
@@ -22,6 +28,12 @@
 {% endmacro %}
 
 
+{#
+-- This macro clones the source database into the destination database and
+-- grants ownership over it, its schemata, and its schemata's tables and views
+-- to a new owner. This macro wraps around the clone_database and
+-- grant_ownership_schema_cascade macros.
+#}
 {% macro clone_database_with_new_owner(
   new_owner_role,
   source_database,
@@ -31,6 +43,8 @@
 {{ clone_database(source_database, destination_database) }}
 
 {% set list_schemas_query %}
+-- get all schemata within the cloned database to then iterate through them and
+-- change their ownership
 select schema_name
 from {{ destination_database }}.information_schema.schemata
 where schema_name != 'INFORMATION_SCHEMA'

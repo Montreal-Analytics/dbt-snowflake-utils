@@ -1,6 +1,6 @@
 # 2-Step dbt Cloning Pattern
 
-Credit: [This cloning pattern is inspired by Dan Gooden’s article here from the Airtasker Tribe blog.](https://medium.com/airtribe/test-sql-pipelines-against-production-clones-using-dbt-and-snowflake-2f8293722dd4) 
+_Credit: [This cloning pattern is inspired by Dan Gooden’s article here from the Airtasker Tribe blog.](https://medium.com/airtribe/test-sql-pipelines-against-production-clones-using-dbt-and-snowflake-2f8293722dd4)_
 
 Cloning is a cost- and time-efficient way of developing dbt models on Snowflake but it can be challenging when your cloning needs traverse different environments with different access controls: i.e. you want to clone a production database for use in development. 
 

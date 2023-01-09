@@ -1,4 +1,13 @@
-{% macro grant_ownership_schema_cascade(new_owner_role, destination_schema, destination_database=target.database) %}
+{#
+-- This macro grants ownership over a schema and its tables and views. It is
+-- called by the clone_schema_with_new_owner and clone_database_with_new_owner
+-- macros.
+#}
+{% macro grant_ownership_schema_cascade(
+  new_owner_role,
+  destination_schema,
+  destination_database=target.database
+) %}
   
   {% if new_owner_role and destination_schema %}
 

@@ -83,7 +83,6 @@ This macro clones the source schema into the destination schema.
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 
 ```
-# for multiple arguments, use the dict syntax
 dbt run-operation clone_schema \
   --args "{'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
 
@@ -109,7 +108,6 @@ This macro clones the source schema into the destination schema and grants owner
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 
 ```
-# for multiple arguments, use the dict syntax
 dbt run-operation clone_schema_with_new_owner \
   --args "{'new_owner_role': 'developer_role', 'source_schema': 'analytics', 'destination_schema': 'ci_schema'}"
 
@@ -167,7 +165,6 @@ This macro drops a schema in the selected database (defaults to target database 
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 
 ```
-# for multiple arguments, use the dict syntax
 dbt run-operation drop_schema \
   --args "{'schema_name': 'customers_temp', 'database': 'production'}"
 ```
@@ -183,7 +180,6 @@ This macro drops a database.
 Call the macro as an [operation](https://docs.getdbt.com/docs/using-operations):
 
 ```
-# for multiple arguments, use the dict syntax
 dbt run-operation drop_database \
   --args "{'database_name': 'production_clone'}"
 ```
