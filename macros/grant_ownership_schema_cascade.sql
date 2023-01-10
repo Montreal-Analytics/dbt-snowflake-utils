@@ -21,8 +21,8 @@
             TO {{ new_owner_role }} REVOKE CURRENT GRANTS;
         GRANT OWNERSHIP ON ALL VIEWS IN SCHEMA {{ destination_database }}.{{ destination_schema }}
             TO {{ new_owner_role }} REVOKE CURRENT GRANTS;
-        GRANT OWNERSHIP ON SCHEMA {{ destination_database }}.{{ destination_schema }}
-            TO {{ new_owner_role }} REVOKE CURRENT GRANTS;
+        GRANT ALL PRIVILEGES ON SCHEMA {{ destination_database }}.{{ destination_schema }}
+            TO {{ new_owner_role }};
     {%- endcall %}
     
     {%- set result = load_result('grant_ownership_cascade') -%}

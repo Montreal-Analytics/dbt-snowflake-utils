@@ -57,7 +57,7 @@
     {{ log("Grant ownership on " ~ destination_database ~ " to " ~ new_owner_role, info=True)}}
 
     {% call statement('clone_database', fetch_result=True, auto_begin=False) -%}
-        GRANT OWNERSHIP ON DATABASE {{ destination_database }} TO {{ new_owner_role }};
+        GRANT ALL PRIVILEGES ON DATABASE {{ destination_database }} TO {{ new_owner_role }};
     {%- endcall %}
 
   {% endif %}
