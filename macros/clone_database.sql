@@ -49,7 +49,7 @@
 
     {% for schema_name in schemata_list %}
 
-        {{ grant_ownership_on_schema_objects(new_owner_role, schema_name, destination_database) }}
+        {{ snowflake_utils.grant_ownership_on_schema_objects(new_owner_role, schema_name, destination_database) }}
 
     {% endfor %}
 

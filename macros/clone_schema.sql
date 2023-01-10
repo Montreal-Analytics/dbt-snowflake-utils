@@ -31,7 +31,7 @@
 
   {% if new_owner_role != '' %}
 
-    {{ grant_ownership_on_schema_objects(new_owner_role, destination_schema, destination_database) }}
+    {{ snowflake_utils.grant_ownership_on_schema_objects(new_owner_role, destination_schema, destination_database) }}
 
   {% endif %}
 
