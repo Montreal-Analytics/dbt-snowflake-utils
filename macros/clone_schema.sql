@@ -1,7 +1,6 @@
 {#
 -- This macro clones the source schema into the destination schema and
 -- optionally grants ownership over it and its tables and views to a new owner.
--- This macro leverages the grant_ownership_schema_cascade macro.
 #}
 {% macro clone_schema(
   source_schema,

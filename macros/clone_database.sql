@@ -1,8 +1,7 @@
 {#
 -- This macro clones the source database into the destination database and
 -- optionally grants ownership over it, its schemata, and its schemata's tables
--- and views to a new owner. This macro leverages the
--- grant_ownership_schema_cascade macro.
+-- and views to a new owner.
 #}
 {% macro clone_database(
   source_database,
