@@ -1,21 +1,25 @@
 {#
--- This macro clones the source database into the destination database.
+-- This macro clones the source database into the destination database and
+-- optionally grants ownership over it, its schemata, and its schemata's tables
+-- and views to a new owner. This macro leverages the
+-- grant_ownership_schema_cascade macro.
 #}
 {% macro clone_database(
   source_database,
-  destination_database
+  destination_database,
+  new_owner_role=''
 ) %}
   
   {% if source_database and destination_database %}
 
     {{ (log("Cloning existing database " ~ source_database ~ 
     " into database " ~ destination_database, info=True)) }}
-    
+
     {% call statement('clone_database', fetch_result=True, auto_begin=False) -%}
         CREATE OR REPLACE DATABASE {{ destination_database }}
           CLONE {{ source_database }};
     {%- endcall %}
-    
+
     {%- set result = load_result('clone_database') -%}
     {{ log(result['data'][0][0], info=True)}}
 
@@ -25,50 +29,37 @@
 
   {% endif %}
 
-{% endmacro %}
+  {% if new_owner_role != '' %}
 
+    {% set list_schemas_query %}
+    -- get all schemata within the cloned database to then iterate through them and
+    -- change their ownership
+    SELECT schema_name
+    FROM {{ destination_database }}.information_schema.schemata
+    WHERE schema_name != 'INFORMATION_SCHEMA'
+    {% endset %}
 
-{#
--- This macro clones the source database into the destination database and
--- grants ownership over it, its schemata, and its schemata's tables and views
--- to a new owner. This macro wraps around the clone_database and
--- grant_ownership_schema_cascade macros.
-#}
-{% macro clone_database_with_new_owner(
-  new_owner_role,
-  source_database,
-  destination_database
-) %}
+    {% set results = run_query(list_schemas_query) %}
 
-{{ clone_database(source_database, destination_database) }}
+    {% if execute %}
+        {# Return the first column #}
+        {% set schemata_list = results.columns[0].values() %}
+    {% else %}
+        {% set schemata_list = [] %}
+    {% endif %}
 
-{% set list_schemas_query %}
--- get all schemata within the cloned database to then iterate through them and
--- change their ownership
-select schema_name
-from {{ destination_database }}.information_schema.schemata
-where schema_name != 'INFORMATION_SCHEMA'
-{% endset %}
+    {% for schema_name in schemata_list %}
 
-{% set results = run_query(list_schemas_query) %}
+        {{ grant_ownership_schema_cascade(new_owner_role, schema_name, destination_database) }}
 
-{% if execute %}
-    {# Return the first column #}
-    {% set schemata_list = results.columns[0].values() %}
-{% else %}
-    {% set schemata_list = [] %}
-{% endif %}
+    {% endfor %}
 
-{% for schema_name in schemata_list %}
+    {{ log("Grant ownership on " ~ destination_database ~ " to " ~ new_owner_role, info=True)}}
 
-    {{ grant_ownership_schema_cascade(new_owner_role, schema_name, destination_database) }}
+    {% call statement('clone_database', fetch_result=True, auto_begin=False) -%}
+        GRANT OWNERSHIP ON DATABASE {{ destination_database }} TO {{ new_owner_role }};
+    {%- endcall %}
 
-{% endfor %}
-
-{{ log("Grant ownership on " ~ destination_database ~ " to " ~ new_owner_role, info=True)}}
-
-{% call statement('clone_database', fetch_result=True, auto_begin=False) -%}
-    GRANT OWNERSHIP ON DATABASE {{ destination_database }} TO {{ new_owner_role }};
-{%- endcall %}
+  {% endif %}
 
 {% endmacro %}

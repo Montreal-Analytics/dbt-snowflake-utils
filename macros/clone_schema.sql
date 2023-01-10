@@ -1,11 +1,14 @@
 {#
--- This macro clones the source schema into the destination schema.
+-- This macro clones the source schema into the destination schema and
+-- optionally grants ownership over it and its tables and views to a new owner.
+-- This macro leverages the grant_ownership_schema_cascade macro.
 #}
 {% macro clone_schema(
   source_schema,
   destination_schema,
   source_database=target.database,
-  destination_database=target.database
+  destination_database=target.database,
+  new_owner_role=''
 ) %}
   
   {% if source_schema and destination_schema %}
@@ -27,24 +30,10 @@
 
   {% endif %}
 
-{% endmacro %}
+  {% if new_owner_role != '' %}
 
+    {{ grant_ownership_schema_cascade(new_owner_role, destination_schema, destination_database) }}
 
-{#
--- This macro clones the source schema into the destination schema and grants
--- ownership over it and its tables and views to a new owner. This macro wraps
--- around the clone_schema and grant_ownership_schema_cascade macros.
-#}
-{% macro clone_schema_with_new_owner(
-  new_owner_role,
-  source_schema,
-  destination_schema,
-  source_database=target.database,
-  destination_database=target.database
-) %}
-
-{{ clone_schema(source_schema, destination_schema, source_database, destination_database) }}
-
-{{ grant_ownership_schema_cascade(new_owner_role, destination_schema, destination_database) }}
+  {% endif %}
 
 {% endmacro %}
