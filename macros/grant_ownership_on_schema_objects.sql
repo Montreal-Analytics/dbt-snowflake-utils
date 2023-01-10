@@ -1,9 +1,8 @@
 {#
--- This macro grants ownership over a schema and its tables and views. It is
--- called by the clone_schema_with_new_owner and clone_database_with_new_owner
--- macros.
+-- This macro grants ownership over a schema's tables and views and is
+-- optionally called by the clone_schema and clone_database macros.
 #}
-{% macro grant_ownership_schema_cascade(
+{% macro grant_ownership_on_schema_objects(
   new_owner_role,
   destination_schema,
   destination_database=target.database
@@ -14,7 +13,7 @@
     {{ (log("Granting ownership on " ~ destination_database ~ "." ~ destination_schema ~ 
     " and its tables and views to " ~ new_owner_role, info=True)) }}
     
-    {% call statement('grant_ownership_cascade', fetch_result=True, auto_begin=False) -%}
+    {% call statement('grant_ownership_on_schema_objects', fetch_result=True, auto_begin=False) -%}
         GRANT USAGE ON SCHEMA {{ destination_database }}.{{ destination_schema }}
             TO {{ new_owner_role }};
         GRANT OWNERSHIP ON ALL TABLES IN SCHEMA {{ destination_database }}.{{ destination_schema }}
@@ -25,7 +24,7 @@
             TO {{ new_owner_role }};
     {%- endcall %}
     
-    {%- set result = load_result('grant_ownership_cascade') -%}
+    {%- set result = load_result('grant_ownership_on_schema_objects') -%}
     {{ log(result['data'][0][0], info=True)}}
 
   {% else %}

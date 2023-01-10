@@ -32,7 +32,7 @@
 
   {% if new_owner_role != '' %}
 
-    {{ grant_ownership_schema_cascade(new_owner_role, destination_schema, destination_database) }}
+    {{ grant_ownership_on_schema_objects(new_owner_role, destination_schema, destination_database) }}
 
   {% endif %}
 
