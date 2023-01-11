@@ -6,8 +6,8 @@ Cloning is a cost- and time-efficient way of developing dbt models on Snowflake 
 
 A solution for this is to run a 2-step cloning pattern:
 
-1. A production role clones the production database or schema and then changes the ownership of that clone object and its sub-objects to a developer role, thus creating a developer clone of production.
-2. Developer users use the developer role to clone that developer clone database or schema, thus creating a new personal developer clone for development.
+1. A production role clones the production database or schema and then changes the ownership of its sub-objects to a developer role, thus creating a developer clone of production. The cloned object is still owned by the production role (which preserves the privilege to drop or replace that clone), but now the developer role has full access of its sub-objects.
+2. Developer users use the developer role to clone that developer clone database or schema, thus creating a new personal developer clone for development. The developer role has full ownership of this cloned database and all its sub-objects.
 
 This pattern can be used for cloning a schema or a database. If all the dbt models are stored within a single schema, schema-level cloning is a good option. When dbt is configured to write data to multiple schemata, database-level cloning is a good, more production-like option.
 
@@ -19,7 +19,7 @@ This patterns optimizes for the following:
 
 ## Setup:
 
-1. Update one of your production jobs to include step 1 of the cloning pattern. Here is an example implementation for database-level cloning from produciton to production_clone:
+1. Update one of your production jobs to include step 1 of the cloning pattern. Here is an example implementation for database-level cloning from production to production_clone:
     
     ```bash
     dbt build &&
@@ -27,7 +27,7 @@ This patterns optimizes for the following:
       --args "{'source_database': 'production', 'destination_database': 'production_clone', 'new_owner_role': 'developer_role'}"
     ```
     
-2. As needed, locally run step 2 of the cloning pattern to create or update personal development clones. Here is an example implementation for database-level cloning from productino_clone to an ephemeral database called developer_clone_me:
+2. As needed, locally run step 2 of the cloning pattern to create or update personal development clones. Here is an example implementation for database-level cloning from production_clone to an ephemeral database called developer_clone_me:
     
     ```bash
     dbt run-operation clone_database \
