@@ -119,6 +119,7 @@ schema.yml
 
 models:
   - name: ACCOUNT
+    +schema: FINANCE
     config:
       meta:
         database_tags:
@@ -134,6 +135,9 @@ models:
 The above means:
 The Snowflake table ACCOUNT will have the tag 'accounting_row_string' set to the value 'visible'.
 Its columns ACCOUNT_NAME and ACCOUNT_NUMBER will both have the tag 'accounting_col_string' set to the value 'visible'
+
+All tags are created in the schema of the model where they are added. In the above example the tags will end up
+in the FINANCE schema (name depends on how [DBT has been configured](https://docs.getdbt.com/docs/build/custom-schemas)).
 
 The macro must be called as part of on-run-end, so add the following to dbt_project.yml:
 ```
