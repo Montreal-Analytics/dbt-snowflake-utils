@@ -1,4 +1,14 @@
-{% macro clone_schema(source_schema, destination_schema, source_database=target.database, destination_database=target.database) %}
+{#
+-- This macro clones the source schema into the destination schema and
+-- optionally grants ownership over it and its tables and views to a new owner.
+#}
+{% macro clone_schema(
+  source_schema,
+  destination_schema,
+  source_database=target.database,
+  destination_database=target.database,
+  new_owner_role=''
+) %}
   
   {% if source_schema and destination_schema %}
 
@@ -16,6 +26,12 @@
   {% else %}
     
     {{ exceptions.raise_compiler_error("Invalid arguments. Missing source schema and/or destination schema") }}
+
+  {% endif %}
+
+  {% if new_owner_role != '' %}
+
+    {{ snowflake_utils.grant_ownership_on_schema_objects(new_owner_role, destination_schema, destination_database) }}
 
   {% endif %}
 
