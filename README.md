@@ -1,6 +1,6 @@
 # Snowflake Utils
 
-This [dbt](https://github.com/dbt-labs/dbt-core) package contains Snowflake-specific macros that can be (re)used across dbt projects.
+This [dbt](https://github.com/dbt-labs/dbt-core) package contains Snowflake-specific macros that can be (re)used across dbt projects. It is maintained by Montreal Analytics, a [Datatonic](https://datatonic.com/) Company.
 
 ## Installation Instructions
 Check [dbt Hub](https://hub.getdbt.com/montreal-analytics/snowflake_utils/latest/) for the latest installation instructions, or [read the docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
