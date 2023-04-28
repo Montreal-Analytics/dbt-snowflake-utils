@@ -1,0 +1,27 @@
+version: 2
+
+macros:
+  - name: create_udf_business_days
+    description: >
+      This macro creates a UDF within the target schema that can be used to 
+      calculate business days (excluding US holidays) between two date fields 
+      in a Snowflake table. The macro mearly creates the UDF within Snowflake,
+      and is called by the create_udfs macro. You must ensure that create_udfs 
+      is called on-run-start in dbt_project.yml.
+
+      To utilize the UDF within your dbt project, proper syntax is:
+
+      select 
+        *,
+        udf_business_days(start_date, end_date) as business_days_elapsed
+      from sample_table
+
+      Notes: 
+      - The fields passed MUST be type == date. 
+      - This UDF only considers holidays between Jan 1 1990 and Dec 31 2030. 
+      - This UDF hard codes holiday date range (above) and holiday date country 
+        (as US). Modify the macro to apply to different countries, define 
+        regional (state or province) holidays or expand the date range.
+
+    docs:
+      show: false

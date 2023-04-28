@@ -124,3 +124,31 @@ If you need this behaviour, it usually comes naturally as dbt drops and recreate
 If you are using the incremental materialization, be aware of this limitation.
 
 {% enddocs %}
+
+{% docs create_udfs %}
+
+Create_udfs is a macro that does exactly as it says, calls the individiual 
+UDFs that are nested in macros/udfs and makes them available to use in 
+your dbt transformations within Snowflake. 
+
+In order to facilitate the use of UDFs within your project, you must add
+the following to your dbt_project.yml file;
+
+on-run-start:
+  - '{{ create_udfs() }}'
+
+Users must have the proper permissions to create UDFs, orchestrated 
+through the following command as an owner/administrator:
+GRANT USAGE ON LANGUAGE PLPYTHONU TO <user>
+
+Why/motivation:
+While many complex transformations are possible with just SQL, creating 
+UDFs allows a project to begin encorporating python packages 
+to make certain transformations incredibly easy and efficient. 
+Additionally, leveraging UDFs via dbt macros allows for:
+- the ability to version control, 
+- the ability to read transformations from your project without needing 
+    to interact with Snowflake
+- to maintain separate dev/prod versions of the UDFs.
+
+{% enddocs %}
