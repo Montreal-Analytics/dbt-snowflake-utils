@@ -40,7 +40,7 @@ def business_hours_py(start_datetime, end_datetime, country='US'):
     # Jump forward to the next non-holiday weekday
     while start_datetime.date() in holiday_list or start_datetime.weekday() in [5,6]: 
         start_datetime = start_datetime.replace(
-            hour = closing_hour, minute = 0, second = 0
+            hour = opening_hour, minute = 0, second = 0
             ) + timedelta(days = 1)
 
     # Jump back to the last non-holiday weekday
