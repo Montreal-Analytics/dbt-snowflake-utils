@@ -1,10 +1,10 @@
 version: 2
 
 macros:
-  - name: create_udf_business_days
+  - name: create_udf_business_hours
     description: >
       This macro creates a UDF within the target schema that can be used to 
-      calculate business days (excluding holidays) between two date fields 
+      calculate business hours (excluding holidays) between two date fields 
       in a Snowflake table. The macro mearly creates the UDF within Snowflake,
       and is called by the create_udfs macro. You must ensure that create_udfs 
       is called on-run-start in dbt_project.yml.
@@ -13,12 +13,12 @@ macros:
 
       select 
         *,
-        udf_business_days(start_date, end_date, country) 
-          as business_days_elapsed
+        udf_business_days(start_datetime, end_datetime, country) 
+          as business_hours_elapsed
       from sample_table
 
       Notes: 
-      - The date fields passed MUST be type == date. 
+      - The date fields passed MUST be type == datetime (i.e. timestamp_ntz). 
       - The country field is optional as it is defaulted to 'US'. If looking to 
         use a different country, must use the ISO 3166-1 alpha-2 country code 
         as defined here: 

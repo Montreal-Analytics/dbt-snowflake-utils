@@ -19,9 +19,9 @@ def business_days_py(start_date, end_date, country='US'):
     end_date = end_date.date()
     years = [*range(1990,2030)]
 
-    US_holiday_list = list(holidays.(years=years))
+    holiday_list = list(holidays.country_holidays(country, years=years))
 
-    return np.busday_count(start_date, end_date, holidays=US_holiday_list)
+    return np.busday_count(start_date, end_date, holidays=holiday_list)
     
 $$
 
