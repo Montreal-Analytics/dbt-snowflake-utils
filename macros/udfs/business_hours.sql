@@ -46,7 +46,7 @@ def business_hours_py(start_datetime, end_datetime, country='US'):
     # weekend, therefore return 0 via max(0,business_hours). 
 
     while start_datetime.date() in holiday_list or start_datetime.weekday() in [5,6]: 
-        start_datetime = start_datetime + timedelta(days=1)
+        start_datetime = start_datetime.replace(hour=opening_hour,minute=0,second=0) + timedelta(days=1)
 
     if start_datetime.date() == end_datetime.date():
         business_hours = round((end_datetime - start_datetime).seconds/60/60,2)
