@@ -13,12 +13,17 @@ macros:
 
       select 
         *,
-        udf_business_days(start_datetime, end_datetime, country) 
+        udf_business_hours(start_datetime, end_datetime, weekmask, country) 
           as business_hours_elapsed
       from sample_table
 
       Notes: 
       - The date fields passed MUST be type == datetime (i.e. timestamp_ntz). 
+      - The weekmask field is a string indicating which days of the week are to
+        be considered business days, and defaults to the standard workweek being
+        Monday through Friday via weekmask = '1111100'; the weekmask starting 
+        with Monday and ending with Sunday, with a 1 indicating viable business
+        day and 0 indicating a non-business day. This field is optional.
       - The country field is optional as it is defaulted to 'US'. If looking to 
         use a different country, must use the ISO 3166-1 alpha-2 country code 
         as defined here: 

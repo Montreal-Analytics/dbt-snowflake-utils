@@ -1,6 +1,6 @@
 {% macro create_udf_business_hours() %}
 
-create or replace function {{target.schema}}.udf_business_hours(start_datetime TIMESTAMP_NTZ, end_datetime TIMESTAMP_NTZ, country STRING)
+create or replace function {{target.schema}}.udf_business_hours(start_datetime TIMESTAMP_NTZ, end_datetime TIMESTAMP_NTZ, weekmask STRING, country STRING)
 returns number
 language python
 runtime_version = 3.8
@@ -14,7 +14,7 @@ from datetime import timedelta
 import holidays
 import numpy as np
 
-def business_hours_py(start_datetime, end_datetime, country='US'):
+def business_hours_py(start_datetime, end_datetime, weekmask = '1111100', country='US'):
 
     # Year range for holidays spanning the years below
     
@@ -22,9 +22,16 @@ def business_hours_py(start_datetime, end_datetime, country='US'):
     
     # Hard coded business hours, opening and closing times
 
-    workhours_per_day = 8
     opening_hour = 9
     closing_hour = 17
+    workhours_per_day = closing_hour-opening_hour
+    omitted_dow = []
+    
+    # Create list of omitted days of week for exclusion of hourly calcs from first and last days of date range
+    
+    for count, i in enumerate(weekmask):
+        if i=='0':
+            omitted_dow.append(count)
 
     # Create open and closing datetimes to establish day 0 and day n durations
 
@@ -35,6 +42,7 @@ def business_hours_py(start_datetime, end_datetime, country='US'):
     days = np.busday_count(
         start_datetime.date(),
         end_datetime.date(),
+        weekmask = weekmask,
         holidays = holiday_list)
     
     # Calculate hours for full business days (excluding first day, last day is automatically excluded in busday_count)
@@ -45,7 +53,7 @@ def business_hours_py(start_datetime, end_datetime, country='US'):
     # When start_datetime is iterated beyond end_datetime, this indicates entirety of hours occuring during holidays or
     # weekend, therefore return 0 via max(0,business_hours). 
 
-    while start_datetime.date() in holiday_list or start_datetime.weekday() in [5,6]: 
+    while start_datetime.date() in holiday_list or start_datetime.weekday() in omitted_dow: 
         start_datetime = start_datetime.replace(hour=opening_hour,minute=0,second=0) + timedelta(days=1)
 
     if start_datetime.date() == end_datetime.date():
@@ -54,7 +62,7 @@ def business_hours_py(start_datetime, end_datetime, country='US'):
     else:
         duration_day_zero = round((first_day_closed - start_datetime ).seconds/60/60, 2)
 
-        if end_datetime.date() in holiday_list or end_datetime.weekday() in [5,6]: 
+        if end_datetime.date() in holiday_list or end_datetime.weekday() in omitted_dow: 
             # If end_datetime falls on a holiday or weekend, the previous full day is accounted for in 
             # complete_day_hours calc so early return just duration_day_zero and complete_day_hours
             business_hours = round(duration_day_zero + complete_days_hours, 2)
