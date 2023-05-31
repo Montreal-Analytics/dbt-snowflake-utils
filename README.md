@@ -196,6 +196,23 @@ This macro only seeks to add or update the tags which are specified in dbt. It w
 If you need this behaviour, it usually comes naturally as dbt drops and recreates tables/views for most materializations.
 If you are using the incremental materialization, be aware of this limitation.
 
+### snowflake_utils.create_udfs ([source](macros/create_udfs.sql))
+This macro will create the udfs listed in the macro (found in [udfs](macros/udfs) folder) into the target schema on-run-start. Once these UDFs are created, this allows the user to call UDFs within their SQL queries/models as part of your dbt project.
+
+#### Arguments
+None: The [on-run-end context object](https://docs.getdbt.com/reference/dbt-jinja-functions/on-run-end-context).
+
+#### Usage
+
+The macro must be called as part of on-run-start, so add the following to dbt_project.yml:
+```
+on-run-end: "{{ create_udfs() }}"
+```
+#### UDFs currently generated
+* udf_business_days
+* udf_business_hours
+
+See individual yaml files within [udfs](macros/udfs/) folder to learn more about syntax and use cases.
 
 ----
 
