@@ -18,7 +18,7 @@ macros:
       from sample_table
 
       Notes: 
-      - The date fields passed MUST be type == date. 
+      - The date fields passed must be of type date or datetime (timestamp_ntz). 
       - The weekmask field is a string indicating which days of the week are to
         be considered business days, and defaults to the standard workweek being
         Monday through Friday via weekmask = '1111100'; the weekmask starting 
