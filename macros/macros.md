@@ -136,7 +136,7 @@ Add this post hook for each tag you want to use the previous tag during the ment
 
 models:
     my_project:
-        +post-hook: "{%set tag_value = (select coalesce((select tag_value from {{this.database}}.staging.stg_account_usage__tag_references where concat_ws('.',object_database,object_schema,object_name) = '{{ this }}' and object_deleted is null),'some-default-value')); alter table {{ this }} set TAG {{this.database}}.{{this.schema}}.tag_name = $tag_value"
+        +post-hook: "{{ apply_cached_tag(this,'some-tag-name','some-default-value') }}"
 
 ```
 This requires:
