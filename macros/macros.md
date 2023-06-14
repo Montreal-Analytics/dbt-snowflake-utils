@@ -139,6 +139,31 @@ models:
         +post-hook: "{{ apply_cached_tag(this,'some-tag-name','some-default-value') }}"
 
 ```
+
+{% enddocs %}
+{% docs apply_cached_tag %}
+This macro applies the previous tag, cached in a dbt model.
+
+
+#### Arguments
+* `this` (required): The database representation of the current model - [this](https://docs.getdbt.com/reference/dbt-jinja-functions/this).
+* `tag_name` (required): The name of the tag to apply value from cache.
+* `default_value` (required): A default value to be applied if tag not found in cache. Will be used for the first time the model runs.
+
+#### Usage
+
+Add the following post-hook to `dbt_project.yml`:
+```yml
+# dbt_project.yml
+
+...
+
+models:
+    my_project:
+        +post-hook: "{{ apply_cached_tag(this,'some-tag-name','some-default-value') }}"
+
+```
+
 This requires:
 
 - Create a base model, materialized as `table`, on top of the view [tag_references](https://docs.snowflake.com/en/sql-reference/account-usage/tag_references).
