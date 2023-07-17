@@ -1,0 +1,49 @@
+version: 2
+
+macros:
+  - name: create_udf_business_days
+    description: >
+      This macro creates a UDF within the target schema that can be used to 
+      calculate business days (excluding holidays) between two date fields 
+      in a Snowflake table. The macro mearly creates the UDF within Snowflake,
+      and is called by the create_udfs macro. You must ensure that create_udfs 
+      is called on-run-start in dbt_project.yml.
+
+      To utilize the UDF within your dbt project, proper syntax is:
+
+      select 
+        *,
+        udf_business_days(start_date, end_date, country, weekmask) 
+          as business_days_elapsed
+      from sample_table
+
+      Notes: 
+      - The date fields passed must be of type date or datetime (timestamp_ntz). 
+      - The country field is optional as it is defaulted to 'US'. This can be a 
+        column within your table if you have businesses in different geographic
+        locations, or can be set as a string for the entire dataset. If looking 
+        to use a different country, must use the ISO 3166-1 alpha-2 country code 
+        as defined here: 
+          https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+      - The weekmask field is a string indicating which days of the week are to
+        be considered business days, and defaults to the standard workweek being
+        Monday through Friday via weekmask = '1111100'; the weekmask starting 
+        with Monday and ending with Sunday, with a 1 indicating viable business
+        day and 0 indicating a non-business day. This field is optional.
+      - Regarding defaulted arguments,calls can be made with the following 
+        syntax: 
+          udf_business_days(start_date, end_date, country, weekmask) 
+          udf_business_days(start_date, end_date, country)
+          udf_business_days(start_date, end_date)  
+      - This UDF only considers holidays between Jan 1 1990 and Dec 31 2030, as
+        is currently hardcoded. This can be changed in the macro source code. 
+      - If increased granularity is desired for the region, you must modify the 
+        macro to apply regional (state or province) holidays as described as 
+        defined here:
+          holiday_list = holidays.country_holidays(country, subdiv='PR')
+      - The holidays python package does not include the end date in its 
+        calculations of the duration. To account for this, you can add a day to 
+        your end date to make the calculation inclusive.
+
+    docs:
+      show: false
