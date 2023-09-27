@@ -1,36 +1,7 @@
 version: 2
 
 macros:
-  - name: clone_schema
-    description: '{{ doc("clone_schema") }}'
-    arguments:
-      - name: source_schema
-        description: Source schema name
-      - name: destination_schema
-        description: Destination schema name
-      - name: source_database
-        description: Source database name (optional). Defaults to target database.
-      - name: destination_database
-        description: Destination database (optional). Defaults to target database.
-
-  - name: drop_schema
-    description: '{{ doc("drop_schema") }}'
-    arguments:
-      - name: schema_name
-        description: Schema to drop
-      - name: database
-        description: Database name (optional). Defaults to target database.
-
-  - name: warehouse_size
-    description: '{{ doc("warehouse_size") }}'
-
-  - name: apply_meta_as_tags
-    description: '{{ doc("apply_meta_as_tags") }}'
-    arguments:
-      - name: results
-        description: The on-run-end context object
   - name: apply_cached_tag
-    description: '{{ doc("apply_cached_tag") }}'
     arguments:
       - name: this
         description: The database representation of the current model
@@ -38,3 +9,53 @@ macros:
         description: The name of the tag to apply value from cache
       - name: default_value
         description: A default value to be applied if tag not found in cache. Will be used for the first time the model runs
+
+  - name: apply_meta_as_tags
+    arguments:
+      - name: results
+        description: The on-run-end context object
+
+  - name: clone_database
+    arguments:
+      - name: source_database
+        description: Source database name, i.e. database to be cloned
+      - name: destination_database
+        description: Destination database name, i.e. the new database to be created
+      - name: new_owner_role
+        description: [Optional] The new owner role of the newly created object
+
+  - name: clone_schema
+    arguments:
+      - name: source_schema
+        description: Source schema name, i.e. schema to be cloned
+      - name: destination_schema
+        description: Destination schema name, i.e. the new schema to be created
+      - name: source_database
+        description: [Optional] Source database name. Defaults to target database.
+      - name: destination_database
+        description: [Optional] Destination database. Defaults to target database.
+      - name: new_owner_role
+        description: [Optional] The new owner role of the newly created object
+
+  - name: drop_database
+    arguments:
+      - name: database_name
+        description: Database to drop
+
+  - name: drop_schema
+    arguments:
+      - name: schema_name
+        description: Schema to drop
+      - name: database
+        description: [Optional] Database name. Defaults to target database.
+
+  - name: grant_ownershop_on_schema_objects
+    arguments:
+      - name: new_owner_role
+        description: The new owner role of the newly created object
+      - name: destination_schema
+        description: Destination schema name, i.e. the new schema to be created
+      - name: destination_database
+        description: [Optional] Destination database. Defaults to target database.
+
+  - name: warehouse_size
