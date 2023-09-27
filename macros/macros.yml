@@ -22,7 +22,7 @@ macros:
       - name: destination_database
         description: Destination database name, i.e. the new database to be created
       - name: new_owner_role
-        description: [Optional] The new owner role of the newly created object
+        description: "[Optional] The new owner role of the newly created object"
 
   - name: clone_schema
     arguments:
@@ -31,11 +31,11 @@ macros:
       - name: destination_schema
         description: Destination schema name, i.e. the new schema to be created
       - name: source_database
-        description: [Optional] Source database name. Defaults to target database.
+        description: "[Optional] Source database name. Defaults to target database."
       - name: destination_database
-        description: [Optional] Destination database. Defaults to target database.
+        description: "[Optional] Destination database. Defaults to target database."
       - name: new_owner_role
-        description: [Optional] The new owner role of the newly created object
+        description: "[Optional] The new owner role of the newly created object"
 
   - name: drop_database
     arguments:
@@ -47,7 +47,7 @@ macros:
       - name: schema_name
         description: Schema to drop
       - name: database
-        description: [Optional] Database name. Defaults to target database.
+        description: "[Optional] Database name. Defaults to target database."
 
   - name: grant_ownershop_on_schema_objects
     arguments:
@@ -56,6 +56,6 @@ macros:
       - name: destination_schema
         description: Destination schema name, i.e. the new schema to be created
       - name: destination_database
-        description: [Optional] Destination database. Defaults to target database.
+        description: "[Optional] Destination database. Defaults to target database."
 
   - name: warehouse_size
