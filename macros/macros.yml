@@ -12,7 +12,7 @@ macros:
         description: Source database name (optional). Defaults to target database.
       - name: destination_database
         description: Destination database (optional). Defaults to target database.
-        
+
   - name: drop_schema
     description: '{{ doc("drop_schema") }}'
     arguments:
@@ -20,7 +20,7 @@ macros:
         description: Schema to drop
       - name: database
         description: Database name (optional). Defaults to target database.
-        
+
   - name: warehouse_size
     description: '{{ doc("warehouse_size") }}'
 
@@ -29,3 +29,12 @@ macros:
     arguments:
       - name: results
         description: The on-run-end context object
+  - name: apply_cached_tag
+    description: '{{ doc("apply_cached_tag") }}'
+    arguments:
+      - name: this
+        description: The database representation of the current model
+      - name: tag_name
+        description: The name of the tag to apply value from cache
+      - name: default_value
+        description: A default value to be applied if tag not found in cache. Will be used for the first time the model runs

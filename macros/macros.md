@@ -123,4 +123,50 @@ This macro only seeks to add or update the tags which are specified in dbt. It w
 If you need this behaviour, it usually comes naturally as dbt drops and recreates tables/views for most materializations.
 If you are using the incremental materialization, be aware of this limitation.
 
+#### Using cached tags
+The macro is called as part of on-run-end. There is a gap between the time **the model run** is complete and **the dbt run** is complete.
+During this gap, models which `is_incremental()` is `False` will be without the configured tag.
+This behavior can pose challenges, particularly when running big monolithic dbt runs.
+To address this issue, you can leverage the previous tag that is cached within a dbt model during this gap.
+Add this post hook for each tag you want to use the previous tag during the mentioned gap:
+```yml
+# dbt_project.yml
+
+...
+
+models:
+    my_project:
+        +post-hook: "{{ apply_cached_tag(this,'some-tag-name','some-default-value') }}"
+
+```
+
+{% enddocs %}
+{% docs apply_cached_tag %}
+This macro applies the previous tag, cached in a dbt model.
+
+
+#### Arguments
+* `this` (required): The database representation of the current model - [this](https://docs.getdbt.com/reference/dbt-jinja-functions/this).
+* `tag_name` (required): The name of the tag to apply value from cache.
+* `default_value` (required): A default value to be applied if tag not found in cache. Will be used for the first time the model runs.
+
+#### Usage
+
+Add the following post-hook to `dbt_project.yml`:
+```yml
+# dbt_project.yml
+
+...
+
+models:
+    my_project:
+        +post-hook: "{{ apply_cached_tag(this,'some-tag-name','some-default-value') }}"
+
+```
+
+This requires:
+
+- Create a base model, materialized as `table`, on top of the view [tag_references](https://docs.snowflake.com/en/sql-reference/account-usage/tag_references).
+- Run `dbt run stg_account_usage__tag_references` before each dbt run.
+
 {% enddocs %}
