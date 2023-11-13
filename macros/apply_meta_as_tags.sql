@@ -13,8 +13,8 @@
             {%- set tag_database = var('common_tag_database') -%}
             {%- set tag_schema = var('common_tag_schema') -%}
             {%- set tag_schema_full = tag_database+'.'+tag_schema -%}
-            {%- set model_database = var('common_tag_database') or res.node.database -%}
-            {%- set model_schema = var('common_tag_schema') or res.node.schema -%}
+            {%- set model_database = res.node.database -%}
+            {%- set model_schema = res.node.schema -%}
             {%- set model_schema_full = model_database+'.'+model_schema -%}
             {%- set model_alias = res.node.alias -%}
 
