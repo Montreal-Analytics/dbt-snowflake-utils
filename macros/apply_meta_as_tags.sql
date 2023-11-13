@@ -10,6 +10,9 @@
     {% for res in results -%}
         {% if snowflake_utils.model_contains_tag_meta(res.node) %}
             
+            {%- set tag_database = var('common_tag_database') -%}
+            {%- set tag_schema = var('common_tag_schema') -%}
+            {%- set tag_schema_full = tag_database+'.'+tag_schema -%}
             {%- set model_database = var('common_tag_database') or res.node.database -%}
             {%- set model_schema = var('common_tag_schema') or res.node.schema -%}
             {%- set model_schema_full = model_database+'.'+model_schema -%}
@@ -23,18 +26,18 @@
                 USE SCHEMA {{model_schema}}
             {%- endcall -%}
 
-            {% if model_schema_full not in tags_by_schema.keys() %}
-                {{ log('need to fetch tags for schema '+model_schema_full, info=True) }}
+            {% if tag_schema_full not in tags_by_schema.keys() %}
+                {{ log('need to fetch tags for schema '+tag_schema_full, info=True) }}
                 {%- call statement('main', fetch_result=True) -%}
-                    show tags in {{model_database}}.{{model_schema}}
+                    show tags in {{tag_database}}.{{tag_schema}}
                 {%- endcall -%}
-                {%- set _ = tags_by_schema.update({model_schema_full: load_result('main')['table'].columns.get('name').values()|list}) -%}
+                {%- set _ = tags_by_schema.update({tag_schema_full: load_result('main')['table'].columns.get('name').values()|list}) -%}
                 {{ log('Added tags to cache', info=True) }}
             {% else %}
                 {{ log('already have tag info for schema', info=True) }}
             {% endif %}
 
-            {%- set current_tags_in_schema = tags_by_schema[model_schema_full] -%}
+            {%- set current_tags_in_schema = tags_by_schema[tag_schema_full] -%}
             {{ log('current_tags_in_schema:', info=True) }}
             {{ log(current_tags_in_schema, info=True) }}
             {{ log("========== Processing tags for "+model_schema_full+"."+model_alias+" ==========", info=True) }}
@@ -62,16 +65,16 @@
             {{ log(existing_tags_for_table, info=True) }}
 
             {% for table_tag in model_meta.database_tags %}
-                {{ snowflake_utils.create_tag_if_missing(current_tags_in_schema,table_tag|upper) }}
+                {{ snowflake_utils.create_tag_if_missing(tag_schema_full|upper,current_tags_in_schema,table_tag|upper) }}
                 {% set desired_tag_value = model_meta.database_tags[table_tag] %}
-                {{ snowflake_utils.set_table_tag_value_if_different(model_alias|upper,table_tag,desired_tag_value,existing_tags_for_table) }}
+                {{ snowflake_utils.set_table_tag_value_if_different(tag_schema_full|upper,model_alias|upper,table_tag,desired_tag_value,existing_tags_for_table) }}
             {% endfor %}
             {% for column in res.node.columns %}
                 {% for column_tag in res.node.columns[column].meta.database_tags %}
                     {{log(column_tag,info=True)}}
-                    {{ snowflake_utils.create_tag_if_missing(current_tags_in_schema,column_tag|upper)}}
+                    {{ snowflake_utils.create_tag_if_missing(tag_schema_full|upper,current_tags_in_schema,column_tag|upper)}}
                     {% set desired_tag_value = res.node.columns[column].meta.database_tags[column_tag] %}
-                    {{ snowflake_utils.set_column_tag_value_if_different(model_alias|upper,column|upper,column_tag,desired_tag_value,existing_tags_for_table)}}
+                    {{ snowflake_utils.set_column_tag_value_if_different(tag_schema_full|upper,model_alias|upper,column|upper,column_tag,desired_tag_value,existing_tags_for_table)}}
                 {% endfor %}
             {% endfor %}
             {{ log("========== Finished processing tags for "+model_alias+" ==========", info=True) }}
@@ -111,11 +114,11 @@
 -- checks if the new tag (new_tag) is already in the list and
 -- creates it in Snowflake if it doesn't.
 #}
-{% macro create_tag_if_missing(all_tag_names,new_tag) %}
+{% macro create_tag_if_missing(tag_schema_full,all_tag_names,new_tag) %}
 	{% if new_tag not in all_tag_names %}
 		{{ log('Creating missing tag '+new_tag, info=True) }}
         {%- call statement('main', fetch_result=True) -%}
-            create tag {{new_tag}}
+            create tag {{tag_schema_full}}.{{new_tag}}
         {%- endcall -%}
         {{ all_tag_names.append(new_tag)}}
 		{{ log(load_result('main').data, info=True) }}
@@ -136,7 +139,7 @@
 -- The fifth column (index 4) contains the value of the tag, so we compare with the desired_tag_value
 -- to see if we need to update it
 #}
-{% macro set_table_tag_value_if_different(table_name,tag_name,desired_tag_value,existing_tags) %}
+{% macro set_table_tag_value_if_different(tag_schema_full,table_name,tag_name,desired_tag_value,existing_tags) %}
     {{ log('Ensuring tag '+tag_name+' has value '+desired_tag_value+' at table level', info=True) }}
     {{ log(existing_tags, info=True) }}
     {%- set existing_tag_for_table = existing_tags|selectattr('0','equalto','TABLE')|selectattr('1','equalto',table_name|upper)|selectattr('3','equalto',tag_name|upper)|list -%}
@@ -147,7 +150,7 @@
     {% else %}
         {{ log('Setting tag value for '+tag_name+' to value '+desired_tag_value, info=True) }}
         {%- call statement('main', fetch_result=True) -%}
-            alter table {{table_name}} set tag {{tag_name}} = '{{desired_tag_value}}'
+            alter table {{table_name}} set tag {{tag_schema_full}}.{{tag_name}} = '{{desired_tag_value}}'
         {%- endcall -%}
         {{ log(load_result('main').data, info=True) }}
     {% endif %}
@@ -163,7 +166,7 @@
 -- The fifth column (index 4) contains the value of the tag, so we compare with the desired_tag_value
 -- to see if we need to update it
 #}
-{% macro set_column_tag_value_if_different(table_name,column_name,tag_name,desired_tag_value,existing_tags) %}
+{% macro set_column_tag_value_if_different(tag_schema_full,table_name,column_name,tag_name,desired_tag_value,existing_tags) %}
     {{ log('Ensuring tag '+tag_name+' has value '+desired_tag_value+' at column level', info=True) }}
     {%- set existing_tag_for_column = existing_tags|selectattr('0','equalto','COLUMN')|selectattr('1','equalto',table_name|upper)|selectattr('2','equalto',column_name|upper)|selectattr('3','equalto',tag_name|upper)|list -%}
     {{ log('Filtered tags for column:', info=True) }}
@@ -173,7 +176,7 @@
     {% else %}
         {{ log('Setting tag value for '+tag_name+' to value '+desired_tag_value, info=True) }}
         {%- call statement('main', fetch_result=True) -%}
-            alter table {{table_name}} modify column {{column_name}} set tag {{tag_name}} = '{{desired_tag_value}}'
+            alter table {{table_name}} modify column {{column_name}} set {{tag_schema_full}}.tag {{tag_name}} = '{{desired_tag_value}}'
         {%- endcall -%}
         {{ log(load_result('main').data, info=True) }}
     {% endif %}
