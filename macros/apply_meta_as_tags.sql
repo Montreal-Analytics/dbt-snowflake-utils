@@ -10,8 +10,8 @@
     {% for res in results -%}
         {% if snowflake_utils.model_contains_tag_meta(res.node) %}
             
-            {%- set model_database = var('common_tag_database') or res.node.database -%}
-            {%- set model_schema = var('common_tag_schema') or res.node.schema -%}
+            {%- set model_database = var('snowflake_utils:common_tag_database') or res.node.database -%}
+            {%- set model_schema = var('snowflake_utils:common_tag_schema') or res.node.schema -%}
             {%- set model_schema_full = model_database+'.'+model_schema -%}
             {%- set model_alias = res.node.alias -%}
 
