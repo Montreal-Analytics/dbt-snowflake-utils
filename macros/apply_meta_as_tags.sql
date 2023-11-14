@@ -9,10 +9,12 @@
     {%- set tags_by_schema = {} -%}
     {% for res in results -%}
         {% if snowflake_utils.model_contains_tag_meta(res.node) %}
-            
+
+            -- Tagging database and schema will be fetched from the below environment variables.
             {%- set tag_database = var('common_tag_database') -%}
             {%- set tag_schema = var('common_tag_schema') -%}
             {%- set tag_schema_full = tag_database+'.'+tag_schema -%}
+
             {%- set model_database = res.node.database -%}
             {%- set model_schema = res.node.schema -%}
             {%- set model_schema_full = model_database+'.'+model_schema -%}
@@ -130,13 +132,14 @@
 -- select LEVEL,OBJECT_NAME,COLUMN_NAME,UPPER(TAG_NAME) as TAG_NAME,TAG_VALUE
 {# 
 -- Updates the value of a Snowflake table tag, if the provided value is different.
--- existing_tags contains the results from querying tag_references_all_columns. 
--- The first column (attribute '0') contains 'TABLE' or 'COLUMN', since we're looking
+-- existing_tags contains the results from querying tag_references_all_columns.
+-- The first column (attribute '0') contains the name of database and schema of tag
+-- The second column (attribute '1') contains 'TABLE' or 'COLUMN', since we're looking
 -- at table tags here then we include only 'TABLE' values.
--- The second column (attribute '1') contains the name of the table, we filter on that.
--- The third column (attribute '2') contains the name of the column, not relevant here.
--- The fourth column (attribute '3') contains the tag name, so we filter on that too.
--- The fifth column (index 4) contains the value of the tag, so we compare with the desired_tag_value
+-- The third column (attribute '2') contains the name of the table, we filter on that.
+-- The third column (attribute '3') contains the name of the column, not relevant here.
+-- The fourth column (attribute '4') contains the tag name, so we filter on that too.
+-- The fifth column (index 5) contains the value of the tag, so we compare with the desired_tag_value
 -- to see if we need to update it
 #}
 {% macro set_table_tag_value_if_different(tag_schema_full,table_name,tag_name,desired_tag_value,existing_tags) %}
@@ -157,13 +160,14 @@
 {% endmacro %}
 {# 
 -- Updates the value of a Snowflake column tag, if the provided value is different.
--- existing_tags contains the results from querying tag_references_all_columns. 
--- The first column (attribute '0') contains 'TABLE' or 'COLUMN', since we're looking
+-- existing_tags contains the results from querying tag_references_all_columns.
+-- The first column (attribute '0') contains the name of database and schema of tag
+-- The second column (attribute '1') contains 'TABLE' or 'COLUMN', since we're looking
 -- at column tags here then we include only 'COLUMN' values.
--- The second column (attribute '1') contains the name of the table, we filter on that.
--- The third column (attribute '2') contains the name of the column, we filter on that.
--- The fourth column (attribute '3') contains the tag name, so we filter on that too.
--- The fifth column (index 4) contains the value of the tag, so we compare with the desired_tag_value
+-- The third column (attribute '2') contains the name of the table, we filter on that.
+-- The fourth column (attribute '3') contains the name of the column, we filter on that.
+-- The fifth column (attribute '4') contains the tag name, so we filter on that too.
+-- The sixth column (index 5) contains the value of the tag, so we compare with the desired_tag_value
 -- to see if we need to update it
 #}
 {% macro set_column_tag_value_if_different(tag_schema_full,table_name,column_name,tag_name,desired_tag_value,existing_tags) %}
