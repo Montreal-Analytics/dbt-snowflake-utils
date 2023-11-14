@@ -70,7 +70,7 @@
                 {% set table_tag_full = tag_schema_full+'.'+table_tag %}
                 {{ snowflake_utils.create_tag_if_missing(current_tags_in_schema,table_tag_full|upper) }}
                 {% set desired_tag_value = model_meta.database_tags[table_tag] %}
-                {{ snowflake_utils.set_table_tag_value_if_different(model_alias|upper,table_tag_full,desired_tag_value,existing_tags_for_table) }}
+                {{ snowflake_utils.set_table_tag_value_if_different(model_alias|upper,table_tag_full|upper,desired_tag_value,existing_tags_for_table) }}
             {% endfor %}
             {% for column in res.node.columns %}
                 {% for column_tag in res.node.columns[column].meta.database_tags %}
@@ -78,7 +78,7 @@
                     {{log(column_tag,info=True)}}
                     {{ snowflake_utils.create_tag_if_missing(current_tags_in_schema,column_tag_full|upper)}}
                     {% set desired_tag_value = res.node.columns[column].meta.database_tags[column_tag] %}
-                    {{ snowflake_utils.set_column_tag_value_if_different(model_alias|upper,column|upper,column_tag_full,desired_tag_value,existing_tags_for_table)}}
+                    {{ snowflake_utils.set_column_tag_value_if_different(model_alias|upper,column|upper,column_tag_full|upper,desired_tag_value,existing_tags_for_table)}}
                 {% endfor %}
             {% endfor %}
             {{ log("========== Finished processing tags for "+model_alias+" ==========", info=True) }}
