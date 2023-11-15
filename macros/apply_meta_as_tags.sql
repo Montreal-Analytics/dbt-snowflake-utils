@@ -11,8 +11,8 @@
         {% if snowflake_utils.model_contains_tag_meta(res.node) %}
 
             -- Tagging database and schema will be fetched from the below environment variables.
-            {%- set tag_database = var('common_tag_database') -%}
-            {%- set tag_schema = var('common_tag_schema') -%}
+            {%- set tag_database = var('common_tag_database', res.node.database) -%}
+            {%- set tag_schema = var('common_tag_schema', res.node.schema) -%}
             {%- set tag_schema_full = tag_database+'.'+tag_schema -%}
 
             {%- set model_database = res.node.database -%}
