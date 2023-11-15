@@ -191,7 +191,7 @@ Its columns ACCOUNT_NAME and ACCOUNT_NUMBER will both have the tag 'accounting_c
 All tags are created in the schema of the model where they are added, by default. In the above example the tags will end up
 in the FINANCE schema (name depends on how [DBT has been configured](https://docs.getdbt.com/docs/build/custom-schemas)).
 If the tag needs to be created in a different location/referred from different location, the below two environment 
-variables need to be added in dbt-project.yml file as below:
+variables need to be added in dbt_project.yml file as below:
 
 ```yml
 # dbt_project.yml
