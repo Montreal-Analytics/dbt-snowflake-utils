@@ -188,8 +188,18 @@ The above means:
 The Snowflake table ACCOUNT will have the tag 'accounting_row_string' set to the value 'visible'.
 Its columns ACCOUNT_NAME and ACCOUNT_NUMBER will both have the tag 'accounting_col_string' set to the value 'visible'
 
-All tags are created in the schema of the model where they are added. In the above example the tags will end up
+All tags are created in the schema of the model where they are added, by default. In the above example the tags will end up
 in the FINANCE schema (name depends on how [DBT has been configured](https://docs.getdbt.com/docs/build/custom-schemas)).
+If the tag needs to be created in a different location/referred from different location, the below two environment 
+variables need to be added in dbt_project.yml file as below:
+
+```yml
+# dbt_project.yml
+
+common_tag_database: 'audit'
+common_tag_schema: 'tags'
+```
+In the above example, the tags will be created in audit.tags .
 
 The macro must be called as part of on-run-end, so add the following to dbt_project.yml:
 ```
