@@ -125,7 +125,7 @@
         {%- call statement('main', fetch_result=True) -%}
             create tag {{new_tag}}
         {%- endcall -%}
-        {{ all_tag_names.append(new_tag)}}
+        {{ all_tag_names.append(new_tag.split('.')[2])}}
 		{{ log(load_result('main').data, info=True) }}
 	{% else %}
 		{{ log('Tag already exists: '+new_tag, info=True) }}
