@@ -196,8 +196,10 @@ variables need to be added in dbt_project.yml file as below:
 ```yml
 # dbt_project.yml
 
-common_tag_database: 'audit'
-common_tag_schema: 'tags'
+...
+vars:
+    common_tag_database: 'audit'
+    common_tag_schema: 'tags'
 ```
 In the above example, the tags will be created in audit.tags .
 
