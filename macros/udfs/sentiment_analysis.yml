@@ -1,0 +1,31 @@
+version: 2
+
+macros:
+  - name: create_udf_sentiment_analysis
+    description: "
+      This macro iterates through a piece of text to return the overall 
+      sentiment of that text. 
+      First, the macro pre-processes the text removing unnecessary punctuation
+      and stopwords to help increase the accuracy of the model. Subsequently, using
+      the transformers library it applies a sentiment analysis pipeline based on a 
+      pre-trained model that will return either a score or a label for the text.
+      
+      Recommendation is to use the following popular models:
+      1. cardiffnlp/twitter-roberta-base-sentiment-latest:
+          (https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest)
+          This model is trained on 124M tweets from January 2018 to December 2021,
+          and is finetuned for sentiment analysis.
+          It outputs a label - Neutral, Positive or Negative - and a score ranging
+          from 0 to 1 - 0 being the most negative and 1, the most positive.
+      2. nlptown/bert-base-multilingual-uncased-sentiment:
+          (https://huggingface.co/nlptown/bert-base-multilingual-uncased-sentiment)
+          This model is fine-tuned for sentiment analysis on product reviews in six 
+          languages: English, Dutch, German, French, Spanish and Italian. It outputs
+          a label - 1 to 5 stars - and a score ranging from 0 to 1 - 0 being the
+          most negative and 1, the most positive.
+      
+      Macro returns a STRING data type. If 'score' is used as an output, then it will
+      have to be cast to FLOAT data type.
+      "
+    docs:
+      show: false
